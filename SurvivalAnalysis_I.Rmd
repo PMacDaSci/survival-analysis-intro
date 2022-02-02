@@ -1,0 +1,560 @@
+---
+title: "Survival Analysis Using R - Part I"
+author: "Madawa Jayawardana"
+date: ''
+output:
+  html_document:
+    highlight: tango
+    toc: yes
+    toc_float:
+      collapsed: yes
+  pdf_document:
+    toc: yes
+  toc:
+    base_numbering: 1
+    nav_menu: {}
+    number_sections: yes
+    sideBar: yes
+    skip_h1_title: no
+    title_cell: Table of Contents
+    title_sidebar: Contents
+    toc_cell: no
+    toc_position: {}
+    toc_section_display: yes
+    toc_window_display: yes
+subtitle: What is survival analysis? KM curves and log-rank tests
+bibliography: biblioSurvival.bib
+---
+
+```{r setup, include=FALSE}
+library(kableExtra)
+#options(knitr.table.format = "html")
+options(kableExtra.auto_format = FALSE)
+
+knitr::knit_hooks$set(
+   error = function(x, options) {
+     paste('\n\n<div class="alert alert-danger">',
+           gsub('##', '\n', gsub('^##\ Error', '**Error**', x)),
+           '</div>', sep = '\n')
+   },
+   warning = function(x, options) {
+     paste('\n\n<div class="alert alert-warning">',
+           gsub('##', '\n', gsub('^##\ Warning:', '**Warning**', x)),
+           '</div>', sep = '\n')
+   },
+   message = function(x, options) {
+     paste('\n\n<div class="alert alert-info">',
+           gsub('##', '\n', x),
+           '</div>', sep = '\n')
+   }
+)
+#`r text_spec("TEXT", background = "#D05A6E", color = "white", bold = T)`
+```
+
+# Introduction 
+
+>Welcome! This is the part I of the workshop series on survival analysis. This will be a gentle introduction to survival analysis using `R` . We'll work through some examples to illustrate the concepts and get you going! 
+
+`r text_spec("We'll cover:", background = "#D05A6E", color = "white", bold = T)`
+
+- Some <u>basic </u> R commands
+  - loading pacakges, `R` functions, plotting etc.
+- What is Survival data?
+- Why we use survival analysis?
+- Types of survival analysis
+- Censoring in survival data
+- Comparison of survival curves (Kaplan-Meier curves, log-rank test etc.)
+
+`r text_spec("Prerequisite:", background = "#D05A6E", color = "white", bold = T)` You should be familiar with basic statistical concepts (odds ratio/risk ratio interpretation, regression) and you will feel much comfortable if you are familiar with any coding language...
+
+After completing this workshop, you should be able to:
+
+- Obtain descriptive statistics & perform data visualisation using `R`
+- Perform survival analysis and interpret parameter estimates
+  - KM curves
+  - Log-rank test
+
+`r text_spec("Workshop resources:", background = "#D05A6E", color = "white", bold = T)`
+
+- we will be mainly using the `survival` base `R` package and the `survminer` package to perform
+all the analyses. The later package has some nice plotting capabilities using the `ggplot2`
+functionality. 
+- data: most of the time we'll be using inbuilt data sets. If not, they will be shared before the session.
+- very good readings:
+  - [Allison, P. (2010), Survival Analysis Using the SAS System, Second Edition, SAS Institute.](https://www.amazon.com/Survival-Analysis-Using-SAS-Practical/dp/1599946408/ref=dp_ob_title_bk)
+  - [Therneau, T. M. and Grambsch, P. M. (2000), Modeling Survival Data: Extending the Cox Model, New York, USA: Springer.](https://www.springer.com/gp/book/9780387987842)
+  - [D. Hosmer and S. Lemeshow (2008), Applied Survival Analysis: Regression Modeling of Time to Event
+Data, Wiley.](https://www.amazon.com/Applied-Survival-Analysis-Time-Event/dp/0471754994)
+  - [Klein, J. P., and Moschberger, M. L. (2003), Survival Analysis: Techniques for Censored and Truncated Data, Springer.](https://www.springer.com/gp/book/9780387953991)
+
+
+# What, why and when?
+
+## What is **survival analysis**?
+
+> `r text_spec("Survival analysis", background = "#D05A6E", color = "white", bold = T)` is the study of survival times (time until the event of interest). The response is often referred to as a  **survival time** (e.g., time to death), **event time** (e.g., time to relapse) or **failure time**.
+
+Some examples of survival data in clinical setup:
+
+- Time to death following a treatment (e.g., cancer treatment)
+- Time to relapse: time to recurrence of tumour/disease after a treatment
+- Time to develop a symptom: Time to return to normal blood pressure after a treatment
+
+![source: @KleinbaumBook](Surv.png)
+
+## Describing survival data: survival & hazard
+
+Survival function and the hazard rate (function) are two most commonly used terms that you'll come across when working with time-to-event data.
+
+>`r text_spec("Survival probability:", background = "#D05A6E", color = "white", bold = T)` Probability of an individual survivng beyond time *t*. 
+
+> $S(t) = Pr(T > t)$
+   
+   
+>`r text_spec("Hazard probability:", background = "#D05A6E", color = "white", bold = T)` Rate/potential of a patient that will have the event of interest at time *t* (denoted by *h(t)*), given that the individual has survived up to time *t*.
+
+> $h(t) = \lim\limits_{\Delta t \to 0} \frac{P(t\; \leq \; T < \;t \;+ \;\Delta t\;| \;T \;\geq\;t)}{\Delta t}$
+
+## Why and when we use **survival analysis**?
+
+> Primary goals of survival analysis (@KleinbaumBook):
+
+1. To estimate and interpret survivor and/or hazard functions from survival data.
+
+2. To compare survivor and/or hazard functions.
+
+3. To assess the relationship of explanatory variables to survival time.
+
+
+**Time-to-event data (survival data) has two important features:**
+
+1. Survival times are all positive (non-negative), thus we may see naturally a skewed (either right or left) data distribution. 
+2. **Censoring**: Survival times of some of the study participants are not observed. 
+    a. Event of interest did not occur before the termination of the study (study end-point)
+    b. Participants were lost in the follow-up
+    c. Participants withdraw from the study
+
+**In survival analysis, we assume that the censoring mechanism is independent to the survival mechanism**
+
+### Censoring 
+
+The three examples above for the censoring are called **right-censoring** (true survival time is above a certain value/ true unobserved event is to the right of the censoring time), which is quite common in majority of the clinical studies. Right censoring occurs when a study participant leaves the study before the event of interest occurs, or the study ends before the event has occurred.
+
+![source: @KleinbaumBook](RightCens.png)
+
+**In survival analysis, we assume that the censoring mechanism is independent to the survival mechanism**
+
+Other types of censoring: 
+
+-**Left-censoring** (true survival time is less than or equal to the observed time): The event-of-interest is occurred before the study end-point, but doesn't know the exact time. For example, a study participant has the event of death before the study finishes (say at 10 months from the surgery), but the event has actually occurred before that. 
+
+-**Interval-censoring** (survival time is between two values): When we don't know the exact time of event occurrence, but know that it is within a time interval. 
+
+`r text_spec("Importance of censoring in analysis:", background = "#D05A6E", color = "white", bold = T)`
+
+- Failure to account for the censoring will give you biased parameter estimates about the survival times and the related quantities.
+
+- Standard methods used to analyse survival data with censored observations are valid only if the censoring is **noninformative*’**. In practical terms, this means that censoring carries no prognostic information about subsequent survival experience; in other words, those who are censored because of loss to follow-up at a given point in time should be as likely to have a subsequent event as those individuals who remain in the study. [@Clark2003_I]
+
+A related example on censoring:
+
+![source: Clark et al, 2003](Cens.png)
+
+### Truncation
+
+Truncation is defined as a condition which screens certain subjects so that the investigator will not be aware of their existence [@KleinBook].   
+
+-**Left truncation** : In left truncation, some (or all) individuals are not followed from time zero (with respect to the study time scale), but only from later entry times. 
+
+![source: @MooreBook](LeftTrunc.png)
+
+### Censoring vs Truncation
+
+> Censoring period is defined as the period the study participant is no longer under observation, but he/she **may experience the event of interest**.
+
+> Truncation period is defined as the period the study participant is no longer under observation, but he/she **cannot experience the event of interest**.
+
+
+### Exercise
+
+1. Prostate cancer patients are given a drug or placebo. Survival time is the duration from remission to relapse. The study ends at 2 years with some patients yet to relapse. What type of censoring do you observe for these participants?
+
+    - Left censoring
+
+    - Interval censoring
+
+    - Right censoring
+
+    - Left truncation
+  
+2. We are interested in identifying prognostic factors for the survival of ovarian cancer patients. Only patients who have survived at least 5 years after diagnosis are included in the study. Type of censoring is
+
+    - Left censoring
+
+    - Interval censoring
+
+    - Right censoring
+
+    - Left truncation
+  
+3. For patients who start feeling better, the physicians decide to exclude them from the study
+
+    - Right truncation
+  
+    - Right censoring
+  
+    - Informative right truncation
+    
+    - Informative right censoring
+  
+## Describing survival data: survival & hazard
+
+>`r text_spec("Survival probability:", background = "#D05A6E", color = "white", bold = T)` Probability that a patient survives from the diagnosis (time of origin) time to a specific time point *t* (denoted by *S(t)*).
+   
+>`r text_spec("Hazard probability:", background = "#D05A6E", color = "white", bold = T)` Probability that a patient will have the even of interest at time *t* (denoted by *h(t)*), given that the individual has survived up to time *t*.
+
+# Kaplan-Meier (KM) survival estimate
+
+KM estimator (a.k.a. product limit estimator) is a non-parametric technique to estimate the survival probability from the observed survival times (Kaplan & Meier, 1958). KM method could be used to obtain survival information of a single study group or between groups. Later means, for example we want to compare the survival pattern of two groups. 
+
+We can use `survival` package in `R` to perform majority of the methods in survival analysis literature. A key function for the analysis of survival data in `R` is function `Surv()`. This is used to specify the type of survival data that we want to analyses, namely, right censored, left censored, interval censored. For our illustrations, we will only consider right censored data in this workshop. 
+
+The `R` object created by using this function is a  **survival object**. 
+
+> What is a **survival object** in `R`?
+
+We declare a **survival object** in `R` using the minimal command `Surv(time, event)`, where
+
+- time: follow-up time for right-censored data
+- event: event indicator (usually dead/alive) 
+
+## KM estimate/curve: single group study
+
+`survfit` function in the `survival` package can be used to obtain KM estimate and to create survival curves. The first argument of the `survfit` function is a formula ($Y \sim X$), where in the left-hand side we state the type of survival data using the function `Surv()` and in the right-hand side grouping information are provided. 
+
+> What are these `R` codes imply?
+
+- `survfit(Surv(time, event) ~ 1)`
+
+- `survfit(Surv(time, event) ~ Treatment)`
+
+Ok... Let's put all these into practice now! We'll consider two examples from ovarian cancer research. One from the study that was discussed in [@Edmonson1979] and the other from Bowtell's lab [@Alsop_2012]. Later study was discussed in the group comparison workshop.
+
+# Case studies
+## Study 1: Ovarian cancer study [@Edmonson1979]
+ 
+We'll be using the `ovarian` cancer data set provided in the `survival` package as the first example. This data set provides survival information in a randomised trial comparing two treatments for ovarian cancer [@Edmonson1979]. There are 6 variables in the data set. They are:
+
+1. `futime` - Follow up time (survival time)
+2. `fustat` - Event of interest occurred or censored 
+3. `age` - Age of the study participants
+4. `resid.ds` - Residual disease status (1=no, 2=yes)
+5. `rx` - Treatment group (two treatments)
+6. `ecog.ps` - Standardised ECOG performance status (1 being good and 2 for not)
+
+### Loading required `R` packages & functions
+
+```{r, echo=T, message=FALSE, warning=FALSE}
+# Function to install&load/load required R packages
+install_load <- function (package1, ...)  {   
+  packages <- c(package1, ...)
+  for(package in packages){
+    if(package %in% rownames(installed.packages()))
+      do.call('library', list(package))
+    else {
+      install.packages(package)
+      do.call("library", list(package))
+    }
+  } 
+}
+
+# Required R packages
+required_R_packages <- c("survival", "survminer", "tidyverse", "psych", 
+                         "readxl", "kableExtra", "plyr")
+
+# Install/load required R packages
+install_load(required_R_packages)
+```
+
+### Loading data from `survival` package
+
+```{r, eval=FALSE, echo=F, message=FALSE, warning=FALSE, comment=""}
+# writexl::write_xlsx(ovarian, "/Users/jayawardanamadawa/Desktop/1.PETERMAC/2.WORK/LABS/1.General/1.Workshops/1.Survival Analysis/Data/ovarian.xlsx")
+```
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+# using the survival R package 
+ovarian_data <- ovarian
+
+# Structure of your data
+str(ovarian_data)
+
+# Facotorisation of variables
+ovarian_data$rx <- factor(ovarian_data$rx, levels = c("1", "2"))
+ovarian_data$resid.ds <- factor(ovarian_data$resid.ds, levels = c("1", "2"), 
+                                labels = c("No", "Yes"))
+ovarian_data$ecog.ps <- factor(ovarian_data$ecog.ps, levels = c("1", "2"), 
+                                labels = c("Good", "Bad"))
+
+# Take a look at ovarian cancer data
+dplyr::glimpse(ovarian_data)
+
+# Function to have overlayed plots
+plot_multi_histogram <- function(df, feature, label_column) {
+    plt <- ggplot(df, aes(x=eval(parse(text=feature)), fill=eval(parse(text=label_column)))) +
+    geom_histogram(alpha=0.7, position="identity", aes(y = ..density..), color="black") +
+    geom_density(alpha=0.7) +
+    labs(x=feature, y = "Density")
+    plt + guides(fill=guide_legend(title=label_column))
+}
+
+# Overlay plot of histogram and the densities 
+plot_multi_histogram(ovarian_data, 'futime', 'rx')
+
+# Descriptive statistics
+describeBy(ovarian_data$futime, ovarian_data$rx, mat = T)[-c(1, 3, 8, 9, 13, 14)] %>% 
+kable(digits = 2) %>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), 
+                full_width = F, 
+                position = "left"
+                )
+```
+
+### KM curves
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+
+# Let us convert the `Vital status` variable to a numeric variable
+ovarian_data$futime <- as.numeric(ovarian_data$futime)
+
+# KM curve: pooling both groups
+KM_all <- survfit(Surv(futime, fustat) ~ 1, data = ovarian_data)
+KM_all
+
+# Alternatively
+surv_median(KM_all)
+
+# Obtaining KM curve
+plot(KM_all)
+
+plot(KM_all, xlab = "Futime", ylab = "Survival probability", bty ="n", lwd=2, 
+     col = "darkblue", main = "Default plotting method", cex.main = 0.8)
+
+```
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+# Nicer plot with more information using survminer package
+ggsurvplot(KM_all, 
+           data = ovarian_data, 
+           conf.int = T, 
+           risk.table = T, 
+           surv.median.line = "hv", 
+           legend.title = "", 
+           legend.labs = c("All"), 
+           xlab='Futime', 
+           legend = c(0.6,0.8)
+           ) 
+
+# Plotting the hazard function
+ggsurvplot(KM_all, 
+           conf.int = TRUE, 
+           risk.table = TRUE, 
+           fun = "cumhaz"
+           )
+```
+
+
+### KM curves for both groups
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+
+# KM curves for both groups
+KM_groups <- survfit(Surv(futime, fustat) ~ rx, data = ovarian_data)
+KM_groups
+
+# Obtaining KM curve
+plot(KM_groups, xlab = "OSDx (months)", ylab = "Survival probability", bty = "n", 
+     col = "darkblue", main = "Default plotting method", cex.main = 0.8)
+```
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+
+# Nicer plot with more information using survminer package
+ggsurvplot(KM_groups, 
+           data = ovarian_data, 
+           conf.int = T, 
+           risk.table = T,  
+           surv.median.line = "hv", 
+           legend.title = "", 
+           legend.labs = c("Treatment 1", "Treatment 2"), 
+           xlab='Futime', 
+           legend = c(0.2,0.2)
+           ) 
+
+# Plotting the hazard functions
+ggsurvplot(KM_groups, 
+           conf.int = TRUE, 
+           risk.table = TRUE, 
+           fun = "cumhaz"
+           )
+
+```
+
+## Study 2: Ovarian cancer study [@Alsop_2012]
+
+We'll consider the overall survival information in this study.
+
+### Loading data
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+JCO_orig <- readxl::read_excel("/Users/jayawardanamadawa/Documents/data_kathryn.xlsx", sheet = 1)
+
+# Get a glimpse of your data
+glimpse(JCO_orig)
+
+str(JCO_final)
+
+# Replacing NAs with "Negative"
+JCO_data <- JCO_orig %>% 
+                replace_na(list(`Gene mutation found in` = "Negative"))
+
+# Factoring "Gene mutation found in" column
+JCO_data$`Gene mutation found in` <- factor(JCO_data$`Gene mutation found in`)
+
+# Replacing BRCA1 and BRCA2 as combined positive
+JCO_data$`Gene mutation found in` <- mapvalues(JCO_data$`Gene mutation found in`,
+         from = c('BRCA1', 'BRCA2'), to = rep('Combined_positive', 2))
+
+# Changing the column name
+names(JCO_data)[21] <- "Mutation_status"
+
+# Filtering only combined positive and negative observations & only overall survival
+JCO_final <- JCO_data %>% 
+                filter(Mutation_status != c("UV"), 
+                       Status != c("PF"))
+
+# Replacing D and P to 1 (dead) and 0 (alive)
+JCO_final$Status <- mapvalues(JCO_final$Status, 
+        from = c('D', 'P'), to = c(1, 0))
+
+# Getting final data set
+JCO_final$Mutation_status <- factor(JCO_final$Mutation_status)
+JCO_final$Status <- as.numeric(JCO_final$Status) 
+```
+### KM curves for both groups
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+
+# KM curves for both groups
+KM_groups_Alsop <- survfit(Surv(OSDx, Status) ~ Mutation_status, data = JCO_final)
+KM_groups_Alsop
+
+table(JCO_final$Status)
+
+# Obtaining KM curve
+ggsurvplot(KM_groups_Alsop, 
+           data = JCO_final, 
+           conf.int = T, 
+           risk.table = T,  
+           surv.median.line = "hv", 
+           legend.title = "", 
+           legend.labs = c("Positive", "Negative"), 
+           xlab='Futime', 
+           legend = c(0.2,0.2)
+           ) 
+```
+
+
+So, now we know how to obtain KM curves using `R`. Next obvious question is,
+
+> How can we test the observed difference in survival is statistically significant or not?
+
+For this purpose, we could use the well established log-rank test. It is a simple test to answer the above question. What is log-rank test?
+
+# Log-rank test
+
+Log-rank (Mantel-Haenszel) test is a non-parametric method for testing the hypothesis:
+
+$H_0 : distribution \; of \; survival \; times \; is \; the \; same  \; for \; the \; groups$  
+
+$H_1 : it \; is \; not\; the \; same$ 
+
+This is a large-sample chi-square test and it provides an overall comparison of the KM curves being compared. The testing null hypothesis is that there is no overall difference between the two survival curves. Under this null hypothesis, the log–rank statistic is distributed approximately chi-square with one degree of freedom.  
+
+**Note:** 
+1. Test is only valid if the ratio between two hazards of the groups is a constant! (proportional hazards assumption)
+
+2. It places the same weight on all follow-up times
+
+The `survival` package provides the function `survdiff` to perform log-rank tests for differences between survival curves. Syntax for this function is pretty similar to the `survfit` function that we used earlier. 
+
+## Case study 1
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+survdiff(Surv(futime, fustat) ~ rx, data = ovarian_data)
+```
+We obtain a non-significant difference in the survival curves between the two treatment groups.
+
+## Case study 2
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+survdiff(Surv(OSDx, Status) ~ Mutation_status, data = JCO_final)
+```
+We obtain a highly significant difference in the survival curves between BRCA1/2 positive and negative groups.
+
+# Weighted Log-rank tests 
+
+Weighted Log-rank tests are useful when the standard assumptions of the general Log-rank test are violated. 
+
+## Peto and Peto modified Gehan-Wilcoxon test
+
+This is a version of Log-rank test that sits broadly under the G-rho family of Harrington and Fleming tests ([@Harrington1982]). It is a good alternative to consider when:
+
+- hazard functions are not proportional
+
+- better when you have more event times earlier
+
+The Peto & Peto modified Gehan-Wilcoxon test is again computed using function `survdiff()`; however, we need to set argument `rho` to 1.
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+survdiff(Surv(futime, fustat) ~ rx, rho = 1, data = ovarian_data)
+```
+
+Similar conclusion as earlier.
+
+
+> Which of the 2 tests should be preferred?
+
+- if survival curves cross, both tests are not optimal
+
+- check if the prportional hazard assumptions is seriously violated (hint: use proportional hazards plot)
+
+  - Log-rank test is the most powerful test when proportionality assumption is valid
+  
+  - otherwise use the weighted method
+
+
+# Stratified log-rank test
+
+Stratified log-rank test is an extension of the log-rank test to incorporate controlling variable(s) to test the effective difference between survival curves of the the variable of interest. For example, let us assume that we have two treatment groups (A & B) and we want to control for gender (male & female). We may use stratified log-rank test in this case to assess the significance of the survival curves of the two treatment groups controlling for the variable gender. Thus, it provides a method of testing the equivalence of survival curves controlling for the stratified variable [@KleinBook].
+
+## Performing stratified log-rank test
+
+```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
+# Obtaining survival curves
+KM_strata <- survfit(Surv(OSDx, Status) ~ Mutation_status + strata(Subtype), data = JCO_final)
+#KM_strata
+
+# Plotting KM survival curves
+ggsurvplot(KM_strata, data = JCO_final)
+                             
+# Stratified log-rank test
+survdiff(Surv(OSDx, Status) ~ Mutation_status + strata(Subtype), data = JCO_final)
+```
+
+The test results indicate that even after adjusting for the possible confounding variable Subtype, there is a statistically significant difference between the survival curves of the two groups.
+
+# Exercise
+
+Consider the variable `resid.ds` (residual disease) in the `ovarian` data set (case study 1) when answering the following questions.
+
+1. Draw KM curves. Comment on the survival patterns of the two groups (residual disease Yes vs. No).
+2. Is there a significant difference between the survival curves?  
+3. Perform a stratified log-rank test to assess the survivor relationship between `resid.ds` and survival times controlling for the variable `agegrp`. Comment on the results.
+
+# References
