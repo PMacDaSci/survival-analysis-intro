@@ -1,0 +1,8 @@
+navbar:
+  title: Introduction to Survival Analysis
+  left:
+  - text: Material
+    href: SurvivalAnalysis_I.html
+output:
+  html_document:
+    theme: flatly

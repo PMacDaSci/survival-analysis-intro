@@ -8,21 +8,8 @@ output:
     toc: yes
     toc_float:
       collapsed: yes
-    code_download: true  
-  pdf_document:
-    toc: yes
-  toc:
-    base_numbering: 1
-    nav_menu: {}
-    number_sections: yes
-    sideBar: yes
-    skip_h1_title: no
-    title_cell: Table of Contents
-    title_sidebar: Contents
-    toc_cell: no
-    toc_position: {}
-    toc_section_display: yes
-    toc_window_display: yes
+    code_download: true
+always_allow_html: true
 subtitle: What is survival analysis? KM curves and log-rank tests
 #bibliography: biblioSurvival.bib
 ---
