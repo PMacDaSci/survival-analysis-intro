@@ -1,0 +1,8 @@
+details > summary {
+  padding: 4px;
+  width: 200px;
+  background-color: #f8f8f8;
+  border: none;
+  box-shadow: 1px 1px 2px #f8f8f8;
+  cursor: pointer;
+}
