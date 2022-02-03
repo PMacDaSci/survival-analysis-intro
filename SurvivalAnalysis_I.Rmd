@@ -23,7 +23,7 @@ output:
     toc_section_display: yes
     toc_window_display: yes
 subtitle: What is survival analysis? KM curves and log-rank tests
-bibliography: biblioSurvival.bib
+#bibliography: biblioSurvival.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -100,7 +100,7 @@ Some examples of survival data in clinical setup:
 - Time to relapse: time to recurrence of tumour/disease after a treatment
 - Time to develop a symptom: Time to return to normal blood pressure after a treatment
 
-![source: @KleinbaumBook](Surv.png)
+[source: @KleinbaumBook](Surv.png)
 
 ## Describing survival data: survival & hazard
 
@@ -140,7 +140,7 @@ Survival function and the hazard rate (function) are two most commonly used term
 
 The three examples above for the censoring are called **right-censoring** (true survival time is above a certain value/ true unobserved event is to the right of the censoring time), which is quite common in majority of the clinical studies. Right censoring occurs when a study participant leaves the study before the event of interest occurs, or the study ends before the event has occurred.
 
-![source: @KleinbaumBook](RightCens.png)
+[source: @KleinbaumBook](RightCens.png)
 
 **In survival analysis, we assume that the censoring mechanism is independent to the survival mechanism**
 
@@ -158,7 +158,7 @@ Other types of censoring:
 
 A related example on censoring:
 
-![source: Clark et al, 2003](Cens.png)
+[source: Clark et al, 2003](Cens.png)
 
 ### Truncation
 
@@ -166,7 +166,7 @@ Truncation is defined as a condition which screens certain subjects so that the 
 
 -**Left truncation** : In left truncation, some (or all) individuals are not followed from time zero (with respect to the study time scale), but only from later entry times. 
 
-![source: @MooreBook](LeftTrunc.png)
+[source: @MooreBook](LeftTrunc.png)
 
 ### Censoring vs Truncation
 
