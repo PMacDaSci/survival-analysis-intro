@@ -9,6 +9,7 @@ output:
     toc_float:
       collapsed: yes
     code_download: true
+    css: "style.css"
 always_allow_html: true
 subtitle: What is survival analysis? KM curves and log-rank tests
 #bibliography: biblioSurvival.bib
@@ -542,5 +543,16 @@ Consider the variable `resid.ds` (residual disease) in the `ovarian` data set (c
 1. Draw KM curves. Comment on the survival patterns of the two groups (residual disease Yes vs. No).
 2. Is there a significant difference between the survival curves?  
 3. Perform a stratified log-rank test to assess the survivor relationship between `resid.ds` and survival times controlling for the variable `agegrp`. Comment on the results.
+
+<br />
+
+<details>
+<summary>**Session Information**</summary>
+```{r}
+sessionInfo()
+```
+</details>
+<br />
+
 
 # References
