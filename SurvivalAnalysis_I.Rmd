@@ -270,7 +270,7 @@ install_load <- function (package1, ...)  {
 
 # Required R packages
 required_R_packages <- c("survival", "survminer", "tidyverse", "psych", 
-                         "readxl", "kableExtra", "plyr")
+                         "readxl", "kableExtra")
 
 # Install/load required R packages
 install_load(required_R_packages)
@@ -420,8 +420,7 @@ JCO_data <- JCO_orig %>%
 JCO_data$`Gene mutation found in` <- factor(JCO_data$`Gene mutation found in`)
 
 # Replacing BRCA1 and BRCA2 as combined positive
-JCO_data$`Gene mutation found in` <- mapvalues(JCO_data$`Gene mutation found in`,
-         from = c('BRCA1', 'BRCA2'), to = rep('Combined_positive', 2))
+JCO_data <- JCO_data %>% mutate(`Gene mutation found in` = recode(`Gene mutation found in`, "BRCA1"="Combined_positive", "BRCA2"="Combined_positive"))
 
 # Changing the column name
 names(JCO_data)[21] <- "Mutation_status"
@@ -432,8 +431,7 @@ JCO_final <- JCO_data %>%
                        Status != c("PF"))
 
 # Replacing D and P to 1 (dead) and 0 (alive)
-JCO_final$Status <- mapvalues(JCO_final$Status, 
-        from = c('D', 'P'), to = c(1, 0))
+JCO_final <- JCO_final %>% mutate(Status = recode(Status, "D"=1, "P"=2))
 
 # Getting final data set
 JCO_final$Mutation_status <- factor(JCO_final$Mutation_status)
