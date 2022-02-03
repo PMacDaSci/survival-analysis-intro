@@ -8,6 +8,7 @@ output:
     toc: yes
     toc_float:
       collapsed: yes
+    code_download: true  
   pdf_document:
     toc: yes
   toc:
