@@ -405,12 +405,12 @@ We'll consider the overall survival information in this study.
 
 ### Loading data
 ```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
-JCO_orig <- readxl::read_excel("/Users/jayawardanamadawa/Documents/data_kathryn.xlsx", sheet = 1)
+JCO_orig <- readxl::read_excel("data/data_kathryn.xlsx", sheet = 1)
 
 # Get a glimpse of your data
 glimpse(JCO_orig)
 
-str(JCO_final)
+str(JCO_orig)
 
 # Replacing NAs with "Negative"
 JCO_data <- JCO_orig %>% 
