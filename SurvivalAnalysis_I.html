@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Madawa Jayawardana" />
+
+
+<title>Survival Analysis Using R - Part I</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/navigation-1.1/sourceembed.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+<style type="text/css">
+#rmd-source-code {
+  display: none;
+}
+</style>
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Introduction to Survival Analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="SurvivalAnalysis_I.html">Material</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-download-source" href="#">Download Rmd</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Survival Analysis Using R - Part I</h1>
+<h3 class="subtitle">What is survival analysis? KM curves and log-rank tests</h3>
+<h4 class="author">Madawa Jayawardana</h4>
+
+</div>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<blockquote>
+<p>Welcome! This is the part I of the workshop series on survival analysis. This will be a gentle introduction to survival analysis using <code>R</code> . We’ll work through some examples to illustrate the concepts and get you going!</p>
+</blockquote>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">We’ll cover:</span></p>
+<ul>
+<li>Some <u>basic </u> R commands
+<ul>
+<li>loading pacakges, <code>R</code> functions, plotting etc.</li>
+</ul></li>
+<li>What is Survival data?</li>
+<li>Why we use survival analysis?</li>
+<li>Types of survival analysis</li>
+<li>Censoring in survival data</li>
+<li>Comparison of survival curves (Kaplan-Meier curves, log-rank test etc.)</li>
+</ul>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Prerequisite:</span> You should be familiar with basic statistical concepts (odds ratio/risk ratio interpretation, regression) and you will feel much comfortable if you are familiar with any coding language…</p>
+<p>After completing this workshop, you should be able to:</p>
+<ul>
+<li>Obtain descriptive statistics &amp; perform data visualisation using <code>R</code></li>
+<li>Perform survival analysis and interpret parameter estimates
+<ul>
+<li>KM curves</li>
+<li>Log-rank test</li>
+</ul></li>
+</ul>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Workshop resources:</span></p>
+<ul>
+<li>we will be mainly using the <code>survival</code> base <code>R</code> package and the <code>survminer</code> package to perform all the analyses. The later package has some nice plotting capabilities using the <code>ggplot2</code> functionality.</li>
+<li>data: most of the time we’ll be using inbuilt data sets. If not, they will be shared before the session.</li>
+<li>very good readings:
+<ul>
+<li><a href="https://www.amazon.com/Survival-Analysis-Using-SAS-Practical/dp/1599946408/ref=dp_ob_title_bk">Allison, P. (2010), Survival Analysis Using the SAS System, Second Edition, SAS Institute.</a></li>
+<li><a href="https://www.springer.com/gp/book/9780387987842">Therneau, T. M. and Grambsch, P. M. (2000), Modeling Survival Data: Extending the Cox Model, New York, USA: Springer.</a></li>
+<li><a href="https://www.amazon.com/Applied-Survival-Analysis-Time-Event/dp/0471754994">D. Hosmer and S. Lemeshow (2008), Applied Survival Analysis: Regression Modeling of Time to Event Data, Wiley.</a></li>
+<li><a href="https://www.springer.com/gp/book/9780387953991">Klein, J. P., and Moschberger, M. L. (2003), Survival Analysis: Techniques for Censored and Truncated Data, Springer.</a></li>
+</ul></li>
+</ul>
+</div>
+<div id="what-why-and-when" class="section level1">
+<h1>What, why and when?</h1>
+<div id="what-is-survival-analysis" class="section level2">
+<h2>What is <strong>survival analysis</strong>?</h2>
+<blockquote>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Survival analysis</span> is the study of survival times (time until the event of interest). The response is often referred to as a <strong>survival time</strong> (e.g., time to death), <strong>event time</strong> (e.g., time to relapse) or <strong>failure time</strong>.</p>
+</blockquote>
+<p>Some examples of survival data in clinical setup:</p>
+<ul>
+<li>Time to death following a treatment (e.g., cancer treatment)</li>
+<li>Time to relapse: time to recurrence of tumour/disease after a treatment</li>
+<li>Time to develop a symptom: Time to return to normal blood pressure after a treatment</li>
+</ul>
+<p><span class="citation">[source: @KleinbaumBook]</span>(Surv.png)</p>
+</div>
+<div id="describing-survival-data-survival-hazard" class="section level2">
+<h2>Describing survival data: survival &amp; hazard</h2>
+<p>Survival function and the hazard rate (function) are two most commonly used terms that you’ll come across when working with time-to-event data.</p>
+<blockquote>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Survival probability:</span> Probability of an individual survivng beyond time <em>t</em>.</p>
+</blockquote>
+<blockquote>
+<p><span class="math inline">\(S(t) = Pr(T &gt; t)\)</span></p>
+</blockquote>
+<blockquote>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Hazard probability:</span> Rate/potential of a patient that will have the event of interest at time <em>t</em> (denoted by <em>h(t)</em>), given that the individual has survived up to time <em>t</em>.</p>
+</blockquote>
+<blockquote>
+<p><span class="math inline">\(h(t) = \lim\limits_{\Delta t \to 0} \frac{P(t\; \leq \; T &lt; \;t \;+ \;\Delta t\;| \;T \;\geq\;t)}{\Delta t}\)</span></p>
+</blockquote>
+</div>
+<div id="why-and-when-we-use-survival-analysis" class="section level2">
+<h2>Why and when we use <strong>survival analysis</strong>?</h2>
+<blockquote>
+<p>Primary goals of survival analysis (<span class="citation">@KleinbaumBook</span>):</p>
+</blockquote>
+<ol style="list-style-type: decimal">
+<li><p>To estimate and interpret survivor and/or hazard functions from survival data.</p></li>
+<li><p>To compare survivor and/or hazard functions.</p></li>
+<li><p>To assess the relationship of explanatory variables to survival time.</p></li>
+</ol>
+<p><strong>Time-to-event data (survival data) has two important features:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Survival times are all positive (non-negative), thus we may see naturally a skewed (either right or left) data distribution.</li>
+<li><strong>Censoring</strong>: Survival times of some of the study participants are not observed.
+<ol style="list-style-type: lower-alpha">
+<li>Event of interest did not occur before the termination of the study (study end-point)</li>
+<li>Participants were lost in the follow-up</li>
+<li>Participants withdraw from the study</li>
+</ol></li>
+</ol>
+<p><strong>In survival analysis, we assume that the censoring mechanism is independent to the survival mechanism</strong></p>
+<div id="censoring" class="section level3">
+<h3>Censoring</h3>
+<p>The three examples above for the censoring are called <strong>right-censoring</strong> (true survival time is above a certain value/ true unobserved event is to the right of the censoring time), which is quite common in majority of the clinical studies. Right censoring occurs when a study participant leaves the study before the event of interest occurs, or the study ends before the event has occurred.</p>
+<p><span class="citation">[source: @KleinbaumBook]</span>(RightCens.png)</p>
+<p><strong>In survival analysis, we assume that the censoring mechanism is independent to the survival mechanism</strong></p>
+<p>Other types of censoring:</p>
+<p>-<strong>Left-censoring</strong> (true survival time is less than or equal to the observed time): The event-of-interest is occurred before the study end-point, but doesn’t know the exact time. For example, a study participant has the event of death before the study finishes (say at 10 months from the surgery), but the event has actually occurred before that.</p>
+<p>-<strong>Interval-censoring</strong> (survival time is between two values): When we don’t know the exact time of event occurrence, but know that it is within a time interval.</p>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Importance of censoring in analysis:</span></p>
+<ul>
+<li><p>Failure to account for the censoring will give you biased parameter estimates about the survival times and the related quantities.</p></li>
+<li><p>Standard methods used to analyse survival data with censored observations are valid only if the censoring is **noninformative*’**. In practical terms, this means that censoring carries no prognostic information about subsequent survival experience; in other words, those who are censored because of loss to follow-up at a given point in time should be as likely to have a subsequent event as those individuals who remain in the study. <span class="citation">[@Clark2003_I]</span></p></li>
+</ul>
+<p>A related example on censoring:</p>
+<p><a href="Cens.png">source: Clark et al, 2003</a></p>
+</div>
+<div id="truncation" class="section level3">
+<h3>Truncation</h3>
+<p>Truncation is defined as a condition which screens certain subjects so that the investigator will not be aware of their existence <span class="citation">[@KleinBook]</span>.</p>
+<p>-<strong>Left truncation</strong> : In left truncation, some (or all) individuals are not followed from time zero (with respect to the study time scale), but only from later entry times.</p>
+<p><span class="citation">[source: @MooreBook]</span>(LeftTrunc.png)</p>
+</div>
+<div id="censoring-vs-truncation" class="section level3">
+<h3>Censoring vs Truncation</h3>
+<blockquote>
+<p>Censoring period is defined as the period the study participant is no longer under observation, but he/she <strong>may experience the event of interest</strong>.</p>
+</blockquote>
+<blockquote>
+<p>Truncation period is defined as the period the study participant is no longer under observation, but he/she <strong>cannot experience the event of interest</strong>.</p>
+</blockquote>
+</div>
+<div id="exercise" class="section level3">
+<h3>Exercise</h3>
+<ol style="list-style-type: decimal">
+<li><p>Prostate cancer patients are given a drug or placebo. Survival time is the duration from remission to relapse. The study ends at 2 years with some patients yet to relapse. What type of censoring do you observe for these participants?</p>
+<ul>
+<li><p>Left censoring</p></li>
+<li><p>Interval censoring</p></li>
+<li><p>Right censoring</p></li>
+<li><p>Left truncation</p></li>
+</ul></li>
+<li><p>We are interested in identifying prognostic factors for the survival of ovarian cancer patients. Only patients who have survived at least 5 years after diagnosis are included in the study. Type of censoring is</p>
+<ul>
+<li><p>Left censoring</p></li>
+<li><p>Interval censoring</p></li>
+<li><p>Right censoring</p></li>
+<li><p>Left truncation</p></li>
+</ul></li>
+<li><p>For patients who start feeling better, the physicians decide to exclude them from the study</p>
+<ul>
+<li><p>Right truncation</p></li>
+<li><p>Right censoring</p></li>
+<li><p>Informative right truncation</p></li>
+<li><p>Informative right censoring</p></li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="describing-survival-data-survival-hazard-1" class="section level2">
+<h2>Describing survival data: survival &amp; hazard</h2>
+<blockquote>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Survival probability:</span> Probability that a patient survives from the diagnosis (time of origin) time to a specific time point <em>t</em> (denoted by <em>S(t)</em>).</p>
+</blockquote>
+<blockquote>
+<p><span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #D05A6E !important;">Hazard probability:</span> Probability that a patient will have the even of interest at time <em>t</em> (denoted by <em>h(t)</em>), given that the individual has survived up to time <em>t</em>.</p>
+</blockquote>
+</div>
+</div>
+<div id="kaplan-meier-km-survival-estimate" class="section level1">
+<h1>Kaplan-Meier (KM) survival estimate</h1>
+<p>KM estimator (a.k.a. product limit estimator) is a non-parametric technique to estimate the survival probability from the observed survival times (Kaplan &amp; Meier, 1958). KM method could be used to obtain survival information of a single study group or between groups. Later means, for example we want to compare the survival pattern of two groups.</p>
+<p>We can use <code>survival</code> package in <code>R</code> to perform majority of the methods in survival analysis literature. A key function for the analysis of survival data in <code>R</code> is function <code>Surv()</code>. This is used to specify the type of survival data that we want to analyses, namely, right censored, left censored, interval censored. For our illustrations, we will only consider right censored data in this workshop.</p>
+<p>The <code>R</code> object created by using this function is a <strong>survival object</strong>.</p>
+<blockquote>
+<p>What is a <strong>survival object</strong> in <code>R</code>?</p>
+</blockquote>
+<p>We declare a <strong>survival object</strong> in <code>R</code> using the minimal command <code>Surv(time, event)</code>, where</p>
+<ul>
+<li>time: follow-up time for right-censored data</li>
+<li>event: event indicator (usually dead/alive)</li>
+</ul>
+<div id="km-estimatecurve-single-group-study" class="section level2">
+<h2>KM estimate/curve: single group study</h2>
+<p><code>survfit</code> function in the <code>survival</code> package can be used to obtain KM estimate and to create survival curves. The first argument of the <code>survfit</code> function is a formula (<span class="math inline">\(Y \sim X\)</span>), where in the left-hand side we state the type of survival data using the function <code>Surv()</code> and in the right-hand side grouping information are provided.</p>
+<blockquote>
+<p>What are these <code>R</code> codes imply?</p>
+</blockquote>
+<ul>
+<li><p><code>survfit(Surv(time, event) ~ 1)</code></p></li>
+<li><p><code>survfit(Surv(time, event) ~ Treatment)</code></p></li>
+</ul>
+<p>Ok… Let’s put all these into practice now! We’ll consider two examples from ovarian cancer research. One from the study that was discussed in <span class="citation">[@Edmonson1979]</span> and the other from Bowtell’s lab <span class="citation">[@Alsop_2012]</span>. Later study was discussed in the group comparison workshop.</p>
+</div>
+</div>
+<div id="case-studies" class="section level1">
+<h1>Case studies</h1>
+<div id="study-1-ovarian-cancer-study-edmonson1979" class="section level2">
+<h2>Study 1: Ovarian cancer study <span class="citation">[@Edmonson1979]</span></h2>
+<p>We’ll be using the <code>ovarian</code> cancer data set provided in the <code>survival</code> package as the first example. This data set provides survival information in a randomised trial comparing two treatments for ovarian cancer <span class="citation">[@Edmonson1979]</span>. There are 6 variables in the data set. They are:</p>
+<ol style="list-style-type: decimal">
+<li><code>futime</code> - Follow up time (survival time)</li>
+<li><code>fustat</code> - Event of interest occurred or censored</li>
+<li><code>age</code> - Age of the study participants</li>
+<li><code>resid.ds</code> - Residual disease status (1=no, 2=yes)</li>
+<li><code>rx</code> - Treatment group (two treatments)</li>
+<li><code>ecog.ps</code> - Standardised ECOG performance status (1 being good and 2 for not)</li>
+</ol>
+<div id="loading-required-r-packages-functions" class="section level3">
+<h3>Loading required <code>R</code> packages &amp; functions</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to install&amp;load/load required R packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>install_load <span class="ot">&lt;-</span> <span class="cf">function</span> (package1, ...)  {   </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  packages <span class="ot">&lt;-</span> <span class="fu">c</span>(package1, ...)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(package <span class="cf">in</span> packages){</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(package <span class="sc">%in%</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>()))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">do.call</span>(<span class="st">&#39;library&#39;</span>, <span class="fu">list</span>(package))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">install.packages</span>(package)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">do.call</span>(<span class="st">&quot;library&quot;</span>, <span class="fu">list</span>(package))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Required R packages</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>required_R_packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;survival&quot;</span>, <span class="st">&quot;survminer&quot;</span>, <span class="st">&quot;tidyverse&quot;</span>, <span class="st">&quot;psych&quot;</span>, </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                         <span class="st">&quot;readxl&quot;</span>, <span class="st">&quot;kableExtra&quot;</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Install/load required R packages</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">install_load</span>(required_R_packages)</span></code></pre></div>
+</div>
+<div id="loading-data-from-survival-package" class="section level3">
+<h3>Loading data from <code>survival</code> package</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># using the survival R package </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ovarian_data <span class="ot">&lt;-</span> ovarian</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Structure of your data</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(ovarian_data)</span></code></pre></div>
+<pre><code>&#39;data.frame&#39;:   26 obs. of  6 variables:
+ $ futime  : num  59 115 156 421 431 448 464 475 477 563 ...
+ $ fustat  : num  1 1 1 0 1 0 1 1 0 1 ...
+ $ age     : num  72.3 74.5 66.5 53.4 50.3 ...
+ $ resid.ds: num  2 2 2 2 2 1 2 2 2 1 ...
+ $ rx      : num  1 1 1 2 1 1 2 2 1 2 ...
+ $ ecog.ps : num  1 1 2 1 1 2 2 2 1 2 ...</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Facotorisation of variables</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>ovarian_data<span class="sc">$</span>rx <span class="ot">&lt;-</span> <span class="fu">factor</span>(ovarian_data<span class="sc">$</span>rx, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>ovarian_data<span class="sc">$</span>resid.ds <span class="ot">&lt;-</span> <span class="fu">factor</span>(ovarian_data<span class="sc">$</span>resid.ds, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>), </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;No&quot;</span>, <span class="st">&quot;Yes&quot;</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ovarian_data<span class="sc">$</span>ecog.ps <span class="ot">&lt;-</span> <span class="fu">factor</span>(ovarian_data<span class="sc">$</span>ecog.ps, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>), </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                                <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Good&quot;</span>, <span class="st">&quot;Bad&quot;</span>))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Take a look at ovarian cancer data</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">glimpse</span>(ovarian_data)</span></code></pre></div>
+<pre><code>Rows: 26
+Columns: 6
+$ futime   &lt;dbl&gt; 59, 115, 156, 421, 431, 448, 464, 475, 477, 563, 638, 744, 76…
+$ fustat   &lt;dbl&gt; 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ age      &lt;dbl&gt; 72.3315, 74.4932, 66.4658, 53.3644, 50.3397, 56.4301, 56.9370…
+$ resid.ds &lt;fct&gt; Yes, Yes, Yes, Yes, Yes, No, Yes, Yes, Yes, No, No, No, Yes, …
+$ rx       &lt;fct&gt; 1, 1, 1, 2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2…
+$ ecog.ps  &lt;fct&gt; Good, Good, Bad, Good, Good, Bad, Bad, Bad, Good, Bad, Bad, G…</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to have overlayed plots</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plot_multi_histogram <span class="ot">&lt;-</span> <span class="cf">function</span>(df, feature, label_column) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    plt <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x=</span><span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text=</span>feature)), <span class="at">fill=</span><span class="fu">eval</span>(<span class="fu">parse</span>(<span class="at">text=</span>label_column)))) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">alpha=</span><span class="fl">0.7</span>, <span class="at">position=</span><span class="st">&quot;identity&quot;</span>, <span class="fu">aes</span>(<span class="at">y =</span> ..density..), <span class="at">color=</span><span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>(<span class="at">alpha=</span><span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x=</span>feature, <span class="at">y =</span> <span class="st">&quot;Density&quot;</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    plt <span class="sc">+</span> <span class="fu">guides</span>(<span class="at">fill=</span><span class="fu">guide_legend</span>(<span class="at">title=</span>label_column))</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Overlay plot of histogram and the densities </span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_multi_histogram</span>(ovarian_data, <span class="st">&#39;futime&#39;</span>, <span class="st">&#39;rx&#39;</span>)</span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Descriptive statistics</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">describeBy</span>(ovarian_data<span class="sc">$</span>futime, ovarian_data<span class="sc">$</span>rx, <span class="at">mat =</span> T)[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">13</span>, <span class="dv">14</span>)] <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>, <span class="st">&quot;condensed&quot;</span>), </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">full_width =</span> F, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">position =</span> <span class="st">&quot;left&quot;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                )</span></code></pre></div>
+<table class="table table-striped table-hover table-condensed" style="width: auto !important; ">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+group1
+</th>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+mean
+</th>
+<th style="text-align:right;">
+sd
+</th>
+<th style="text-align:right;">
+median
+</th>
+<th style="text-align:right;">
+min
+</th>
+<th style="text-align:right;">
+max
+</th>
+<th style="text-align:right;">
+range
+</th>
+<th style="text-align:right;">
+se
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+X11
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+517.31
+</td>
+<td style="text-align:right;">
+346.88
+</td>
+<td style="text-align:right;">
+448
+</td>
+<td style="text-align:right;">
+59
+</td>
+<td style="text-align:right;">
+1106
+</td>
+<td style="text-align:right;">
+1047
+</td>
+<td style="text-align:right;">
+96.21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+X12
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+681.77
+</td>
+<td style="text-align:right;">
+324.68
+</td>
+<td style="text-align:right;">
+563
+</td>
+<td style="text-align:right;">
+353
+</td>
+<td style="text-align:right;">
+1227
+</td>
+<td style="text-align:right;">
+874
+</td>
+<td style="text-align:right;">
+90.05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="km-curves" class="section level3">
+<h3>KM curves</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Let us convert the `Vital status` variable to a numeric variable</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>ovarian_data<span class="sc">$</span>futime <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(ovarian_data<span class="sc">$</span>futime)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># KM curve: pooling both groups</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>KM_all <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(futime, fustat) <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> ovarian_data)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>KM_all</span></code></pre></div>
+<pre><code>Call: survfit(formula = Surv(futime, fustat) ~ 1, data = ovarian_data)
+
+      n events median 0.95LCL 0.95UCL
+[1,] 26     12    638     464      NA</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternatively</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">surv_median</span>(KM_all)</span></code></pre></div>
+<pre><code>  strata median lower upper
+1    All    638   464    NA</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtaining KM curve</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(KM_all)</span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(KM_all, <span class="at">xlab =</span> <span class="st">&quot;Futime&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Survival probability&quot;</span>, <span class="at">bty =</span><span class="st">&quot;n&quot;</span>, <span class="at">lwd=</span><span class="dv">2</span>, </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Default plotting method&quot;</span>, <span class="at">cex.main =</span> <span class="fl">0.8</span>)</span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Nicer plot with more information using survminer package</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsurvplot</span>(KM_all, </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> ovarian_data, </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">conf.int =</span> T, </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">risk.table =</span> T, </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">surv.median.line =</span> <span class="st">&quot;hv&quot;</span>, </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend.title =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend.labs =</span> <span class="fu">c</span>(<span class="st">&quot;All&quot;</span>), </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlab=</span><span class="st">&#39;Futime&#39;</span>, </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend =</span> <span class="fu">c</span>(<span class="fl">0.6</span>,<span class="fl">0.8</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>           ) </span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting the hazard function</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsurvplot</span>(KM_all, </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">conf.int =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">risk.table =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">fun =</span> <span class="st">&quot;cumhaz&quot;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>           )</span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</div>
+<div id="km-curves-for-both-groups" class="section level3">
+<h3>KM curves for both groups</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># KM curves for both groups</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>KM_groups <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(futime, fustat) <span class="sc">~</span> rx, <span class="at">data =</span> ovarian_data)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>KM_groups</span></code></pre></div>
+<pre><code>Call: survfit(formula = Surv(futime, fustat) ~ rx, data = ovarian_data)
+
+      n events median 0.95LCL 0.95UCL
+rx=1 13      7    638     268      NA
+rx=2 13      5     NA     475      NA</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtaining KM curve</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(KM_groups, <span class="at">xlab =</span> <span class="st">&quot;OSDx (months)&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Survival probability&quot;</span>, <span class="at">bty =</span> <span class="st">&quot;n&quot;</span>, </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Default plotting method&quot;</span>, <span class="at">cex.main =</span> <span class="fl">0.8</span>)</span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Nicer plot with more information using survminer package</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsurvplot</span>(KM_groups, </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> ovarian_data, </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">conf.int =</span> T, </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">risk.table =</span> T,  </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">surv.median.line =</span> <span class="st">&quot;hv&quot;</span>, </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend.title =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend.labs =</span> <span class="fu">c</span>(<span class="st">&quot;Treatment 1&quot;</span>, <span class="st">&quot;Treatment 2&quot;</span>), </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlab=</span><span class="st">&#39;Futime&#39;</span>, </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend =</span> <span class="fu">c</span>(<span class="fl">0.2</span>,<span class="fl">0.2</span>)</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>           ) </span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting the hazard functions</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsurvplot</span>(KM_groups, </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">conf.int =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">risk.table =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">fun =</span> <span class="st">&quot;cumhaz&quot;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>           )</span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+</div>
+</div>
+<div id="study-2-ovarian-cancer-study-alsop_2012" class="section level2">
+<h2>Study 2: Ovarian cancer study <span class="citation">[@Alsop_2012]</span></h2>
+<p>We’ll consider the overall survival information in this study.</p>
+<div id="loading-data" class="section level3">
+<h3>Loading data</h3>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>JCO_orig <span class="ot">&lt;-</span> readxl<span class="sc">::</span><span class="fu">read_excel</span>(<span class="st">&quot;data/data_kathryn.xlsx&quot;</span>, <span class="at">sheet =</span> <span class="dv">1</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a glimpse of your data</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(JCO_orig)</span></code></pre></div>
+<pre><code>Rows: 1,001
+Columns: 21
+$ `Deidentified StudyID`   &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14…
+$ AgeAtDiag                &lt;dbl&gt; 68.14521, 54.19178, 79.96986, 53.96438, 70.50…
+$ `Age Group`              &lt;dbl&gt; 4, 3, 4, 3, 4, 1, 2, 4, 3, 2, 4, 4, 4, 4, 4, …
+$ Status                   &lt;chr&gt; &quot;D&quot;, &quot;D&quot;, &quot;PF&quot;, &quot;D&quot;, &quot;D&quot;, &quot;P&quot;, &quot;D&quot;, &quot;D&quot;, &quot;PF&quot;…
+$ PFSDx                    &lt;dbl&gt; 18.8381497, 16.0765361, 68.3499359, 10.356050…
+$ OSDx                     &lt;dbl&gt; 52.2733997, 35.0461913, 68.3499359, 39.024229…
+$ `Primary Site`           &lt;chr&gt; &quot;Ovary&quot;, &quot;Peritoneum&quot;, &quot;Fallopian&quot;, &quot;Ovary&quot;, …
+$ Subtype                  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 1, 2, …
+$ Description              &lt;chr&gt; &quot;Papillary serous adenocarcinoma (C56.9)&quot;, &quot;P…
+$ `Grade+Differentiation`  &lt;chr&gt; &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;9&quot;, &quot;3&quot;, &quot;1&quot;, &quot;3&quot;, &quot;3&quot;, &quot;2&quot;, …
+$ StageGrp                 &lt;chr&gt; &quot;IV&quot;, &quot;IV&quot;, &quot;IV&quot;, &quot;III&quot;, &quot;III&quot;, &quot;III&quot;, &quot;III&quot;,…
+$ race                     &lt;dbl&gt; 1, 1, 1, 5, 5, 1, 1, 1, 1, 5, 1, 1, 5, 5, 1, …
+$ PrimaryPlt               &lt;dbl&gt; 6, 6, 6, 6, NA, 6, 8, 6, 4, 8, 6, 6, 7, 1, 6,…
+$ CauseDeath               &lt;chr&gt; &quot;1&quot;, &quot;1&quot;, NA, &quot;1&quot;, &quot;2&quot;, NA, &quot;1&quot;, &quot;1&quot;, NA, NA,…
+$ PrimaryTaxane            &lt;dbl&gt; NA, 6, NA, 6, NA, 6, 8, 6, NA, 8, 4, 5, 4, 4,…
+$ OptimalDebulking         &lt;dbl&gt; 2, 3, 1, 2, 2, 1, 3, 1, 1, 1, 1, 1, 1, 3, 2, …
+$ Time                     &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ PF                       &lt;dbl&gt; 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, …
+$ PFReason                 &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, &quot;…
+$ Mcancer                  &lt;dbl&gt; 0, 0, 0, 0, 4, 0, 0, 0, 5, 4, 0, 5, 5, 5, 0, …
+$ `Gene mutation found in` &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(JCO_orig)</span></code></pre></div>
+<pre><code>tibble [1,001 × 21] (S3: tbl_df/tbl/data.frame)
+ $ Deidentified StudyID  : num [1:1001] 1 2 3 4 5 6 7 8 9 10 ...
+ $ AgeAtDiag             : num [1:1001] 68.1 54.2 80 54 70.5 ...
+ $ Age Group             : num [1:1001] 4 3 4 3 4 1 2 4 3 2 ...
+ $ Status                : chr [1:1001] &quot;D&quot; &quot;D&quot; &quot;PF&quot; &quot;D&quot; ...
+ $ PFSDx                 : num [1:1001] 18.838 16.077 68.35 10.356 0.756 ...
+ $ OSDx                  : num [1:1001] 52.273 35.046 68.35 39.024 0.756 ...
+ $ Primary Site          : chr [1:1001] &quot;Ovary&quot; &quot;Peritoneum&quot; &quot;Fallopian&quot; &quot;Ovary&quot; ...
+ $ Subtype               : num [1:1001] 1 1 1 1 1 1 1 1 3 1 ...
+ $ Description           : chr [1:1001] &quot;Papillary serous adenocarcinoma (C56.9)&quot; &quot;Papillary serous adenocarcinoma (C56.9)&quot; &quot;Papillary serous cystadenocarcinoma (C56.9)&quot; &quot;Papillary serous cystadenocarcinoma (C56.9)&quot; ...
+ $ Grade+Differentiation : chr [1:1001] &quot;3&quot; &quot;3&quot; &quot;3&quot; &quot;9&quot; ...
+ $ StageGrp              : chr [1:1001] &quot;IV&quot; &quot;IV&quot; &quot;IV&quot; &quot;III&quot; ...
+ $ race                  : num [1:1001] 1 1 1 5 5 1 1 1 1 5 ...
+ $ PrimaryPlt            : num [1:1001] 6 6 6 6 NA 6 8 6 4 8 ...
+ $ CauseDeath            : chr [1:1001] &quot;1&quot; &quot;1&quot; NA &quot;1&quot; ...
+ $ PrimaryTaxane         : num [1:1001] NA 6 NA 6 NA 6 8 6 NA 8 ...
+ $ OptimalDebulking      : num [1:1001] 2 3 1 2 2 1 3 1 1 1 ...
+ $ Time                  : chr [1:1001] NA NA NA NA ...
+ $ PF                    : num [1:1001] 0 0 0 0 2 0 0 0 0 0 ...
+ $ PFReason              : chr [1:1001] NA NA NA NA ...
+ $ Mcancer               : num [1:1001] 0 0 0 0 4 0 0 0 5 4 ...
+ $ Gene mutation found in: chr [1:1001] NA NA NA NA ...</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replacing NAs with &quot;Negative&quot;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>JCO_data <span class="ot">&lt;-</span> JCO_orig <span class="sc">%&gt;%</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="st">`</span><span class="at">Gene mutation found in</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Negative&quot;</span>))</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Factoring &quot;Gene mutation found in&quot; column</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>JCO_data<span class="sc">$</span><span class="st">`</span><span class="at">Gene mutation found in</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="fu">factor</span>(JCO_data<span class="sc">$</span><span class="st">`</span><span class="at">Gene mutation found in</span><span class="st">`</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Replacing BRCA1 and BRCA2 as combined positive</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>JCO_data <span class="ot">&lt;-</span> JCO_data <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Gene mutation found in</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">recode</span>(<span class="st">`</span><span class="at">Gene mutation found in</span><span class="st">`</span>, <span class="st">&quot;BRCA1&quot;</span><span class="ot">=</span><span class="st">&quot;Combined_positive&quot;</span>, <span class="st">&quot;BRCA2&quot;</span><span class="ot">=</span><span class="st">&quot;Combined_positive&quot;</span>))</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Changing the column name</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(JCO_data)[<span class="dv">21</span>] <span class="ot">&lt;-</span> <span class="st">&quot;Mutation_status&quot;</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtering only combined positive and negative observations &amp; only overall survival</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>JCO_final <span class="ot">&lt;-</span> JCO_data <span class="sc">%&gt;%</span> </span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(Mutation_status <span class="sc">!=</span> <span class="fu">c</span>(<span class="st">&quot;UV&quot;</span>), </span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>                       Status <span class="sc">!=</span> <span class="fu">c</span>(<span class="st">&quot;PF&quot;</span>))</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Replacing D and P to 1 (dead) and 0 (alive)</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>JCO_final <span class="ot">&lt;-</span> JCO_final <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Status =</span> <span class="fu">recode</span>(Status, <span class="st">&quot;D&quot;</span><span class="ot">=</span><span class="dv">1</span>, <span class="st">&quot;P&quot;</span><span class="ot">=</span><span class="dv">2</span>))</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Getting final data set</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>JCO_final<span class="sc">$</span>Mutation_status <span class="ot">&lt;-</span> <span class="fu">factor</span>(JCO_final<span class="sc">$</span>Mutation_status)</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>JCO_final<span class="sc">$</span>Status <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(JCO_final<span class="sc">$</span>Status) </span></code></pre></div>
+</div>
+<div id="km-curves-for-both-groups-1" class="section level3">
+<h3>KM curves for both groups</h3>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># KM curves for both groups</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>KM_groups_Alsop <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(OSDx, Status) <span class="sc">~</span> Mutation_status, <span class="at">data =</span> JCO_final)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>KM_groups_Alsop</span></code></pre></div>
+<pre><code>Call: survfit(formula = Surv(OSDx, Status) ~ Mutation_status, data = JCO_final)
+
+                                    n events median 0.95LCL 0.95UCL
+Mutation_status=Combined_positive 106     30   72.0    67.9    77.2
+Mutation_status=Negative          566    110   70.7    67.4    74.2</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(JCO_final<span class="sc">$</span>Status)</span></code></pre></div>
+<pre><code>
+  1   2 
+532 140 </code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtaining KM curve</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsurvplot</span>(KM_groups_Alsop, </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> JCO_final, </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">conf.int =</span> T, </span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">risk.table =</span> T,  </span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">surv.median.line =</span> <span class="st">&quot;hv&quot;</span>, </span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend.title =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend.labs =</span> <span class="fu">c</span>(<span class="st">&quot;Positive&quot;</span>, <span class="st">&quot;Negative&quot;</span>), </span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlab=</span><span class="st">&#39;Futime&#39;</span>, </span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">legend =</span> <span class="fu">c</span>(<span class="fl">0.2</span>,<span class="fl">0.2</span>)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>           ) </span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>So, now we know how to obtain KM curves using <code>R</code>. Next obvious question is,</p>
+<blockquote>
+<p>How can we test the observed difference in survival is statistically significant or not?</p>
+</blockquote>
+<p>For this purpose, we could use the well established log-rank test. It is a simple test to answer the above question. What is log-rank test?</p>
+</div>
+</div>
+</div>
+<div id="log-rank-test" class="section level1">
+<h1>Log-rank test</h1>
+<p>Log-rank (Mantel-Haenszel) test is a non-parametric method for testing the hypothesis:</p>
+<p><span class="math inline">\(H_0 : distribution \; of \; survival \; times \; is \; the \; same \; for \; the \; groups\)</span></p>
+<p><span class="math inline">\(H_1 : it \; is \; not\; the \; same\)</span></p>
+<p>This is a large-sample chi-square test and it provides an overall comparison of the KM curves being compared. The testing null hypothesis is that there is no overall difference between the two survival curves. Under this null hypothesis, the log–rank statistic is distributed approximately chi-square with one degree of freedom.</p>
+<p><strong>Note:</strong> 1. Test is only valid if the ratio between two hazards of the groups is a constant! (proportional hazards assumption)</p>
+<ol start="2" style="list-style-type: decimal">
+<li>It places the same weight on all follow-up times</li>
+</ol>
+<p>The <code>survival</code> package provides the function <code>survdiff</code> to perform log-rank tests for differences between survival curves. Syntax for this function is pretty similar to the <code>survfit</code> function that we used earlier.</p>
+<div id="case-study-1" class="section level2">
+<h2>Case study 1</h2>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(futime, fustat) <span class="sc">~</span> rx, <span class="at">data =</span> ovarian_data)</span></code></pre></div>
+<pre><code>Call:
+survdiff(formula = Surv(futime, fustat) ~ rx, data = ovarian_data)
+
+      N Observed Expected (O-E)^2/E (O-E)^2/V
+rx=1 13        7     5.23     0.596      1.06
+rx=2 13        5     6.77     0.461      1.06
+
+ Chisq= 1.1  on 1 degrees of freedom, p= 0.3 </code></pre>
+<p>We obtain a non-significant difference in the survival curves between the two treatment groups.</p>
+</div>
+<div id="case-study-2" class="section level2">
+<h2>Case study 2</h2>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(OSDx, Status) <span class="sc">~</span> Mutation_status, <span class="at">data =</span> JCO_final)</span></code></pre></div>
+<pre><code>Call:
+survdiff(formula = Surv(OSDx, Status) ~ Mutation_status, data = JCO_final)
+
+                                    N Observed Expected (O-E)^2/E (O-E)^2/V
+Mutation_status=Combined_positive 106       30     32.6    0.2134     0.281
+Mutation_status=Negative          566      110    107.4    0.0649     0.281
+
+ Chisq= 0.3  on 1 degrees of freedom, p= 0.6 </code></pre>
+<p>We obtain a highly significant difference in the survival curves between BRCA1/2 positive and negative groups.</p>
+</div>
+</div>
+<div id="weighted-log-rank-tests" class="section level1">
+<h1>Weighted Log-rank tests</h1>
+<p>Weighted Log-rank tests are useful when the standard assumptions of the general Log-rank test are violated.</p>
+<div id="peto-and-peto-modified-gehan-wilcoxon-test" class="section level2">
+<h2>Peto and Peto modified Gehan-Wilcoxon test</h2>
+<p>This is a version of Log-rank test that sits broadly under the G-rho family of Harrington and Fleming tests (<span class="citation">[@Harrington1982]</span>). It is a good alternative to consider when:</p>
+<ul>
+<li><p>hazard functions are not proportional</p></li>
+<li><p>better when you have more event times earlier</p></li>
+</ul>
+<p>The Peto &amp; Peto modified Gehan-Wilcoxon test is again computed using function <code>survdiff()</code>; however, we need to set argument <code>rho</code> to 1.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(futime, fustat) <span class="sc">~</span> rx, <span class="at">rho =</span> <span class="dv">1</span>, <span class="at">data =</span> ovarian_data)</span></code></pre></div>
+<pre><code>Call:
+survdiff(formula = Surv(futime, fustat) ~ rx, data = ovarian_data, 
+    rho = 1)
+
+      N Observed Expected (O-E)^2/E (O-E)^2/V
+rx=1 13     5.89     4.12     0.761      1.68
+rx=2 13     3.50     5.27     0.595      1.68
+
+ Chisq= 1.7  on 1 degrees of freedom, p= 0.2 </code></pre>
+<p>Similar conclusion as earlier.</p>
+<blockquote>
+<p>Which of the 2 tests should be preferred?</p>
+</blockquote>
+<ul>
+<li><p>if survival curves cross, both tests are not optimal</p></li>
+<li><p>check if the prportional hazard assumptions is seriously violated (hint: use proportional hazards plot)</p>
+<ul>
+<li><p>Log-rank test is the most powerful test when proportionality assumption is valid</p></li>
+<li><p>otherwise use the weighted method</p></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="stratified-log-rank-test" class="section level1">
+<h1>Stratified log-rank test</h1>
+<p>Stratified log-rank test is an extension of the log-rank test to incorporate controlling variable(s) to test the effective difference between survival curves of the the variable of interest. For example, let us assume that we have two treatment groups (A &amp; B) and we want to control for gender (male &amp; female). We may use stratified log-rank test in this case to assess the significance of the survival curves of the two treatment groups controlling for the variable gender. Thus, it provides a method of testing the equivalence of survival curves controlling for the stratified variable <span class="citation">[@KleinBook]</span>.</p>
+<div id="performing-stratified-log-rank-test" class="section level2">
+<h2>Performing stratified log-rank test</h2>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtaining survival curves</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>KM_strata <span class="ot">&lt;-</span> <span class="fu">survfit</span>(<span class="fu">Surv</span>(OSDx, Status) <span class="sc">~</span> Mutation_status <span class="sc">+</span> <span class="fu">strata</span>(Subtype), <span class="at">data =</span> JCO_final)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co">#KM_strata</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting KM survival curves</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsurvplot</span>(KM_strata, <span class="at">data =</span> JCO_final)</span></code></pre></div>
+<p><img src="SurvivalAnalysis_I_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stratified log-rank test</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">survdiff</span>(<span class="fu">Surv</span>(OSDx, Status) <span class="sc">~</span> Mutation_status <span class="sc">+</span> <span class="fu">strata</span>(Subtype), <span class="at">data =</span> JCO_final)</span></code></pre></div>
+<pre><code>Call:
+survdiff(formula = Surv(OSDx, Status) ~ Mutation_status + strata(Subtype), 
+    data = JCO_final)
+
+                                    N Observed Expected (O-E)^2/E (O-E)^2/V
+Mutation_status=Combined_positive 106       30     32.2    0.1448     0.213
+Mutation_status=Negative          566      110    107.8    0.0432     0.213
+
+ Chisq= 0.2  on 1 degrees of freedom, p= 0.6 </code></pre>
+<p>The test results indicate that even after adjusting for the possible confounding variable Subtype, there is a statistically significant difference between the survival curves of the two groups.</p>
+</div>
+</div>
+<div id="exercise-1" class="section level1">
+<h1>Exercise</h1>
+<p>Consider the variable <code>resid.ds</code> (residual disease) in the <code>ovarian</code> data set (case study 1) when answering the following questions.</p>
+<ol style="list-style-type: decimal">
+<li>Draw KM curves. Comment on the survival patterns of the two groups (residual disease Yes vs. No).</li>
+<li>Is there a significant difference between the survival curves?<br />
+</li>
+<li>Perform a stratified log-rank test to assess the survivor relationship between <code>resid.ds</code> and survival times controlling for the variable <code>agegrp</code>. Comment on the results.</li>
+</ol>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+</div>
+
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiU3Vydml2YWwgQW5hbHlzaXMgVXNpbmcgUiAtIFBhcnQgSSIKYXV0aG9yOiAiTWFkYXdhIEpheWF3YXJkYW5hIgpkYXRlOiAnJwpvdXRwdXQ6CiAgaHRtbF9kb2N1bWVudDoKICAgIGhpZ2hsaWdodDogdGFuZ28KICAgIHRvYzogeWVzCiAgICB0b2NfZmxvYXQ6CiAgICAgIGNvbGxhcHNlZDogeWVzCiAgICBjb2RlX2Rvd25sb2FkOiB0cnVlCmFsd2F5c19hbGxvd19odG1sOiB0cnVlCnN1YnRpdGxlOiBXaGF0IGlzIHN1cnZpdmFsIGFuYWx5c2lzPyBLTSBjdXJ2ZXMgYW5kIGxvZy1yYW5rIHRlc3RzCiNiaWJsaW9ncmFwaHk6IGJpYmxpb1N1cnZpdmFsLmJpYgotLS0KCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQpsaWJyYXJ5KGthYmxlRXh0cmEpCiNvcHRpb25zKGtuaXRyLnRhYmxlLmZvcm1hdCA9ICJodG1sIikKb3B0aW9ucyhrYWJsZUV4dHJhLmF1dG9fZm9ybWF0ID0gRkFMU0UpCgprbml0cjo6a25pdF9ob29rcyRzZXQoCiAgIGVycm9yID0gZnVuY3Rpb24oeCwgb3B0aW9ucykgewogICAgIHBhc3RlKCdcblxuPGRpdiBjbGFzcz0iYWxlcnQgYWxlcnQtZGFuZ2VyIj4nLAogICAgICAgICAgIGdzdWIoJyMjJywgJ1xuJywgZ3N1YignXiMjXCBFcnJvcicsICcqKkVycm9yKionLCB4KSksCiAgICAgICAgICAgJzwvZGl2PicsIHNlcCA9ICdcbicpCiAgIH0sCiAgIHdhcm5pbmcgPSBmdW5jdGlvbih4LCBvcHRpb25zKSB7CiAgICAgcGFzdGUoJ1xuXG48ZGl2IGNsYXNzPSJhbGVydCBhbGVydC13YXJuaW5nIj4nLAogICAgICAgICAgIGdzdWIoJyMjJywgJ1xuJywgZ3N1YignXiMjXCBXYXJuaW5nOicsICcqKldhcm5pbmcqKicsIHgpKSwKICAgICAgICAgICAnPC9kaXY+Jywgc2VwID0gJ1xuJykKICAgfSwKICAgbWVzc2FnZSA9IGZ1bmN0aW9uKHgsIG9wdGlvbnMpIHsKICAgICBwYXN0ZSgnXG5cbjxkaXYgY2xhc3M9ImFsZXJ0IGFsZXJ0LWluZm8iPicsCiAgICAgICAgICAgZ3N1YignIyMnLCAnXG4nLCB4KSwKICAgICAgICAgICAnPC9kaXY+Jywgc2VwID0gJ1xuJykKICAgfQopCiNgciB0ZXh0X3NwZWMoIlRFWFQiLCBiYWNrZ3JvdW5kID0gIiNEMDVBNkUiLCBjb2xvciA9ICJ3aGl0ZSIsIGJvbGQgPSBUKWAKYGBgCgojIEludHJvZHVjdGlvbiAKCj5XZWxjb21lISBUaGlzIGlzIHRoZSBwYXJ0IEkgb2YgdGhlIHdvcmtzaG9wIHNlcmllcyBvbiBzdXJ2aXZhbCBhbmFseXNpcy4gVGhpcyB3aWxsIGJlIGEgZ2VudGxlIGludHJvZHVjdGlvbiB0byBzdXJ2aXZhbCBhbmFseXNpcyB1c2luZyBgUmAgLiBXZSdsbCB3b3JrIHRocm91Z2ggc29tZSBleGFtcGxlcyB0byBpbGx1c3RyYXRlIHRoZSBjb25jZXB0cyBhbmQgZ2V0IHlvdSBnb2luZyEgCgpgciB0ZXh0X3NwZWMoIldlJ2xsIGNvdmVyOiIsIGJhY2tncm91bmQgPSAiI0QwNUE2RSIsIGNvbG9yID0gIndoaXRlIiwgYm9sZCA9IFQpYAoKLSBTb21lIDx1PmJhc2ljIDwvdT4gUiBjb21tYW5kcwogIC0gbG9hZGluZyBwYWNha2dlcywgYFJgIGZ1bmN0aW9ucywgcGxvdHRpbmcgZXRjLgotIFdoYXQgaXMgU3Vydml2YWwgZGF0YT8KLSBXaHkgd2UgdXNlIHN1cnZpdmFsIGFuYWx5c2lzPwotIFR5cGVzIG9mIHN1cnZpdmFsIGFuYWx5c2lzCi0gQ2Vuc29yaW5nIGluIHN1cnZpdmFsIGRhdGEKLSBDb21wYXJpc29uIG9mIHN1cnZpdmFsIGN1cnZlcyAoS2FwbGFuLU1laWVyIGN1cnZlcywgbG9nLXJhbmsgdGVzdCBldGMuKQoKYHIgdGV4dF9zcGVjKCJQcmVyZXF1aXNpdGU6IiwgYmFja2dyb3VuZCA9ICIjRDA1QTZFIiwgY29sb3IgPSAid2hpdGUiLCBib2xkID0gVClgIFlvdSBzaG91bGQgYmUgZmFtaWxpYXIgd2l0aCBiYXNpYyBzdGF0aXN0aWNhbCBjb25jZXB0cyAob2RkcyByYXRpby9yaXNrIHJhdGlvIGludGVycHJldGF0aW9uLCByZWdyZXNzaW9uKSBhbmQgeW91IHdpbGwgZmVlbCBtdWNoIGNvbWZvcnRhYmxlIGlmIHlvdSBhcmUgZmFtaWxpYXIgd2l0aCBhbnkgY29kaW5nIGxhbmd1YWdlLi4uCgpBZnRlciBjb21wbGV0aW5nIHRoaXMgd29ya3Nob3AsIHlvdSBzaG91bGQgYmUgYWJsZSB0bzoKCi0gT2J0YWluIGRlc2NyaXB0aXZlIHN0YXRpc3RpY3MgJiBwZXJmb3JtIGRhdGEgdmlzdWFsaXNhdGlvbiB1c2luZyBgUmAKLSBQZXJmb3JtIHN1cnZpdmFsIGFuYWx5c2lzIGFuZCBpbnRlcnByZXQgcGFyYW1ldGVyIGVzdGltYXRlcwogIC0gS00gY3VydmVzCiAgLSBMb2ctcmFuayB0ZXN0CgpgciB0ZXh0X3NwZWMoIldvcmtzaG9wIHJlc291cmNlczoiLCBiYWNrZ3JvdW5kID0gIiNEMDVBNkUiLCBjb2xvciA9ICJ3aGl0ZSIsIGJvbGQgPSBUKWAKCi0gd2Ugd2lsbCBiZSBtYWlubHkgdXNpbmcgdGhlIGBzdXJ2aXZhbGAgYmFzZSBgUmAgcGFja2FnZSBhbmQgdGhlIGBzdXJ2bWluZXJgIHBhY2thZ2UgdG8gcGVyZm9ybQphbGwgdGhlIGFuYWx5c2VzLiBUaGUgbGF0ZXIgcGFja2FnZSBoYXMgc29tZSBuaWNlIHBsb3R0aW5nIGNhcGFiaWxpdGllcyB1c2luZyB0aGUgYGdncGxvdDJgCmZ1bmN0aW9uYWxpdHkuIAotIGRhdGE6IG1vc3Qgb2YgdGhlIHRpbWUgd2UnbGwgYmUgdXNpbmcgaW5idWlsdCBkYXRhIHNldHMuIElmIG5vdCwgdGhleSB3aWxsIGJlIHNoYXJlZCBiZWZvcmUgdGhlIHNlc3Npb24uCi0gdmVyeSBnb29kIHJlYWRpbmdzOgogIC0gW0FsbGlzb24sIFAuICgyMDEwKSwgU3Vydml2YWwgQW5hbHlzaXMgVXNpbmcgdGhlIFNBUyBTeXN0ZW0sIFNlY29uZCBFZGl0aW9uLCBTQVMgSW5zdGl0dXRlLl0oaHR0cHM6Ly93d3cuYW1hem9uLmNvbS9TdXJ2aXZhbC1BbmFseXNpcy1Vc2luZy1TQVMtUHJhY3RpY2FsL2RwLzE1OTk5NDY0MDgvcmVmPWRwX29iX3RpdGxlX2JrKQogIC0gW1RoZXJuZWF1LCBULiBNLiBhbmQgR3JhbWJzY2gsIFAuIE0uICgyMDAwKSwgTW9kZWxpbmcgU3Vydml2YWwgRGF0YTogRXh0ZW5kaW5nIHRoZSBDb3ggTW9kZWwsIE5ldyBZb3JrLCBVU0E6IFNwcmluZ2VyLl0oaHR0cHM6Ly93d3cuc3ByaW5nZXIuY29tL2dwL2Jvb2svOTc4MDM4Nzk4Nzg0MikKICAtIFtELiBIb3NtZXIgYW5kIFMuIExlbWVzaG93ICgyMDA4KSwgQXBwbGllZCBTdXJ2aXZhbCBBbmFseXNpczogUmVncmVzc2lvbiBNb2RlbGluZyBvZiBUaW1lIHRvIEV2ZW50CkRhdGEsIFdpbGV5Ll0oaHR0cHM6Ly93d3cuYW1hem9uLmNvbS9BcHBsaWVkLVN1cnZpdmFsLUFuYWx5c2lzLVRpbWUtRXZlbnQvZHAvMDQ3MTc1NDk5NCkKICAtIFtLbGVpbiwgSi4gUC4sIGFuZCBNb3NjaGJlcmdlciwgTS4gTC4gKDIwMDMpLCBTdXJ2aXZhbCBBbmFseXNpczogVGVjaG5pcXVlcyBmb3IgQ2Vuc29yZWQgYW5kIFRydW5jYXRlZCBEYXRhLCBTcHJpbmdlci5dKGh0dHBzOi8vd3d3LnNwcmluZ2VyLmNvbS9ncC9ib29rLzk3ODAzODc5NTM5OTEpCgoKIyBXaGF0LCB3aHkgYW5kIHdoZW4/CgojIyBXaGF0IGlzICoqc3Vydml2YWwgYW5hbHlzaXMqKj8KCj4gYHIgdGV4dF9zcGVjKCJTdXJ2aXZhbCBhbmFseXNpcyIsIGJhY2tncm91bmQgPSAiI0QwNUE2RSIsIGNvbG9yID0gIndoaXRlIiwgYm9sZCA9IFQpYCBpcyB0aGUgc3R1ZHkgb2Ygc3Vydml2YWwgdGltZXMgKHRpbWUgdW50aWwgdGhlIGV2ZW50IG9mIGludGVyZXN0KS4gVGhlIHJlc3BvbnNlIGlzIG9mdGVuIHJlZmVycmVkIHRvIGFzIGEgICoqc3Vydml2YWwgdGltZSoqIChlLmcuLCB0aW1lIHRvIGRlYXRoKSwgKipldmVudCB0aW1lKiogKGUuZy4sIHRpbWUgdG8gcmVsYXBzZSkgb3IgKipmYWlsdXJlIHRpbWUqKi4KClNvbWUgZXhhbXBsZXMgb2Ygc3Vydml2YWwgZGF0YSBpbiBjbGluaWNhbCBzZXR1cDoKCi0gVGltZSB0byBkZWF0aCBmb2xsb3dpbmcgYSB0cmVhdG1lbnQgKGUuZy4sIGNhbmNlciB0cmVhdG1lbnQpCi0gVGltZSB0byByZWxhcHNlOiB0aW1lIHRvIHJlY3VycmVuY2Ugb2YgdHVtb3VyL2Rpc2Vhc2UgYWZ0ZXIgYSB0cmVhdG1lbnQKLSBUaW1lIHRvIGRldmVsb3AgYSBzeW1wdG9tOiBUaW1lIHRvIHJldHVybiB0byBub3JtYWwgYmxvb2QgcHJlc3N1cmUgYWZ0ZXIgYSB0cmVhdG1lbnQKCltzb3VyY2U6IEBLbGVpbmJhdW1Cb29rXShTdXJ2LnBuZykKCiMjIERlc2NyaWJpbmcgc3Vydml2YWwgZGF0YTogc3Vydml2YWwgJiBoYXphcmQKClN1cnZpdmFsIGZ1bmN0aW9uIGFuZCB0aGUgaGF6YXJkIHJhdGUgKGZ1bmN0aW9uKSBhcmUgdHdvIG1vc3QgY29tbW9ubHkgdXNlZCB0ZXJtcyB0aGF0IHlvdSdsbCBjb21lIGFjcm9zcyB3aGVuIHdvcmtpbmcgd2l0aCB0aW1lLXRvLWV2ZW50IGRhdGEuCgo+YHIgdGV4dF9zcGVjKCJTdXJ2aXZhbCBwcm9iYWJpbGl0eToiLCBiYWNrZ3JvdW5kID0gIiNEMDVBNkUiLCBjb2xvciA9ICJ3aGl0ZSIsIGJvbGQgPSBUKWAgUHJvYmFiaWxpdHkgb2YgYW4gaW5kaXZpZHVhbCBzdXJ2aXZuZyBiZXlvbmQgdGltZSAqdCouIAoKPiAkUyh0KSA9IFByKFQgPiB0KSQKICAgCiAgIAo+YHIgdGV4dF9zcGVjKCJIYXphcmQgcHJvYmFiaWxpdHk6IiwgYmFja2dyb3VuZCA9ICIjRDA1QTZFIiwgY29sb3IgPSAid2hpdGUiLCBib2xkID0gVClgIFJhdGUvcG90ZW50aWFsIG9mIGEgcGF0aWVudCB0aGF0IHdpbGwgaGF2ZSB0aGUgZXZlbnQgb2YgaW50ZXJlc3QgYXQgdGltZSAqdCogKGRlbm90ZWQgYnkgKmgodCkqKSwgZ2l2ZW4gdGhhdCB0aGUgaW5kaXZpZHVhbCBoYXMgc3Vydml2ZWQgdXAgdG8gdGltZSAqdCouCgo+ICRoKHQpID0gXGxpbVxsaW1pdHNfe1xEZWx0YSB0IFx0byAwfSBcZnJhY3tQKHRcOyBcbGVxIFw7IFQgPCBcO3QgXDsrIFw7XERlbHRhIHRcO3wgXDtUIFw7XGdlcVw7dCl9e1xEZWx0YSB0fSQKCiMjIFdoeSBhbmQgd2hlbiB3ZSB1c2UgKipzdXJ2aXZhbCBhbmFseXNpcyoqPwoKPiBQcmltYXJ5IGdvYWxzIG9mIHN1cnZpdmFsIGFuYWx5c2lzIChAS2xlaW5iYXVtQm9vayk6CgoxLiBUbyBlc3RpbWF0ZSBhbmQgaW50ZXJwcmV0IHN1cnZpdm9yIGFuZC9vciBoYXphcmQgZnVuY3Rpb25zIGZyb20gc3Vydml2YWwgZGF0YS4KCjIuIFRvIGNvbXBhcmUgc3Vydml2b3IgYW5kL29yIGhhemFyZCBmdW5jdGlvbnMuCgozLiBUbyBhc3Nlc3MgdGhlIHJlbGF0aW9uc2hpcCBvZiBleHBsYW5hdG9yeSB2YXJpYWJsZXMgdG8gc3Vydml2YWwgdGltZS4KCgoqKlRpbWUtdG8tZXZlbnQgZGF0YSAoc3Vydml2YWwgZGF0YSkgaGFzIHR3byBpbXBvcnRhbnQgZmVhdHVyZXM6KioKCjEuIFN1cnZpdmFsIHRpbWVzIGFyZSBhbGwgcG9zaXRpdmUgKG5vbi1uZWdhdGl2ZSksIHRodXMgd2UgbWF5IHNlZSBuYXR1cmFsbHkgYSBza2V3ZWQgKGVpdGhlciByaWdodCBvciBsZWZ0KSBkYXRhIGRpc3RyaWJ1dGlvbi4gCjIuICoqQ2Vuc29yaW5nKio6IFN1cnZpdmFsIHRpbWVzIG9mIHNvbWUgb2YgdGhlIHN0dWR5IHBhcnRpY2lwYW50cyBhcmUgbm90IG9ic2VydmVkLiAKICAgIGEuIEV2ZW50IG9mIGludGVyZXN0IGRpZCBub3Qgb2NjdXIgYmVmb3JlIHRoZSB0ZXJtaW5hdGlvbiBvZiB0aGUgc3R1ZHkgKHN0dWR5IGVuZC1wb2ludCkKICAgIGIuIFBhcnRpY2lwYW50cyB3ZXJlIGxvc3QgaW4gdGhlIGZvbGxvdy11cAogICAgYy4gUGFydGljaXBhbnRzIHdpdGhkcmF3IGZyb20gdGhlIHN0dWR5CgoqKkluIHN1cnZpdmFsIGFuYWx5c2lzLCB3ZSBhc3N1bWUgdGhhdCB0aGUgY2Vuc29yaW5nIG1lY2hhbmlzbSBpcyBpbmRlcGVuZGVudCB0byB0aGUgc3Vydml2YWwgbWVjaGFuaXNtKioKCiMjIyBDZW5zb3JpbmcgCgpUaGUgdGhyZWUgZXhhbXBsZXMgYWJvdmUgZm9yIHRoZSBjZW5zb3JpbmcgYXJlIGNhbGxlZCAqKnJpZ2h0LWNlbnNvcmluZyoqICh0cnVlIHN1cnZpdmFsIHRpbWUgaXMgYWJvdmUgYSBjZXJ0YWluIHZhbHVlLyB0cnVlIHVub2JzZXJ2ZWQgZXZlbnQgaXMgdG8gdGhlIHJpZ2h0IG9mIHRoZSBjZW5zb3JpbmcgdGltZSksIHdoaWNoIGlzIHF1aXRlIGNvbW1vbiBpbiBtYWpvcml0eSBvZiB0aGUgY2xpbmljYWwgc3R1ZGllcy4gUmlnaHQgY2Vuc29yaW5nIG9jY3VycyB3aGVuIGEgc3R1ZHkgcGFydGljaXBhbnQgbGVhdmVzIHRoZSBzdHVkeSBiZWZvcmUgdGhlIGV2ZW50IG9mIGludGVyZXN0IG9jY3Vycywgb3IgdGhlIHN0dWR5IGVuZHMgYmVmb3JlIHRoZSBldmVudCBoYXMgb2NjdXJyZWQuCgpbc291cmNlOiBAS2xlaW5iYXVtQm9va10oUmlnaHRDZW5zLnBuZykKCioqSW4gc3Vydml2YWwgYW5hbHlzaXMsIHdlIGFzc3VtZSB0aGF0IHRoZSBjZW5zb3JpbmcgbWVjaGFuaXNtIGlzIGluZGVwZW5kZW50IHRvIHRoZSBzdXJ2aXZhbCBtZWNoYW5pc20qKgoKT3RoZXIgdHlwZXMgb2YgY2Vuc29yaW5nOiAKCi0qKkxlZnQtY2Vuc29yaW5nKiogKHRydWUgc3Vydml2YWwgdGltZSBpcyBsZXNzIHRoYW4gb3IgZXF1YWwgdG8gdGhlIG9ic2VydmVkIHRpbWUpOiBUaGUgZXZlbnQtb2YtaW50ZXJlc3QgaXMgb2NjdXJyZWQgYmVmb3JlIHRoZSBzdHVkeSBlbmQtcG9pbnQsIGJ1dCBkb2Vzbid0IGtub3cgdGhlIGV4YWN0IHRpbWUuIEZvciBleGFtcGxlLCBhIHN0dWR5IHBhcnRpY2lwYW50IGhhcyB0aGUgZXZlbnQgb2YgZGVhdGggYmVmb3JlIHRoZSBzdHVkeSBmaW5pc2hlcyAoc2F5IGF0IDEwIG1vbnRocyBmcm9tIHRoZSBzdXJnZXJ5KSwgYnV0IHRoZSBldmVudCBoYXMgYWN0dWFsbHkgb2NjdXJyZWQgYmVmb3JlIHRoYXQuIAoKLSoqSW50ZXJ2YWwtY2Vuc29yaW5nKiogKHN1cnZpdmFsIHRpbWUgaXMgYmV0d2VlbiB0d28gdmFsdWVzKTogV2hlbiB3ZSBkb24ndCBrbm93IHRoZSBleGFjdCB0aW1lIG9mIGV2ZW50IG9jY3VycmVuY2UsIGJ1dCBrbm93IHRoYXQgaXQgaXMgd2l0aGluIGEgdGltZSBpbnRlcnZhbC4gCgpgciB0ZXh0X3NwZWMoIkltcG9ydGFuY2Ugb2YgY2Vuc29yaW5nIGluIGFuYWx5c2lzOiIsIGJhY2tncm91bmQgPSAiI0QwNUE2RSIsIGNvbG9yID0gIndoaXRlIiwgYm9sZCA9IFQpYAoKLSBGYWlsdXJlIHRvIGFjY291bnQgZm9yIHRoZSBjZW5zb3Jpbmcgd2lsbCBnaXZlIHlvdSBiaWFzZWQgcGFyYW1ldGVyIGVzdGltYXRlcyBhYm91dCB0aGUgc3Vydml2YWwgdGltZXMgYW5kIHRoZSByZWxhdGVkIHF1YW50aXRpZXMuCgotIFN0YW5kYXJkIG1ldGhvZHMgdXNlZCB0byBhbmFseXNlIHN1cnZpdmFsIGRhdGEgd2l0aCBjZW5zb3JlZCBvYnNlcnZhdGlvbnMgYXJlIHZhbGlkIG9ubHkgaWYgdGhlIGNlbnNvcmluZyBpcyAqKm5vbmluZm9ybWF0aXZlKuKAmSoqLiBJbiBwcmFjdGljYWwgdGVybXMsIHRoaXMgbWVhbnMgdGhhdCBjZW5zb3JpbmcgY2FycmllcyBubyBwcm9nbm9zdGljIGluZm9ybWF0aW9uIGFib3V0IHN1YnNlcXVlbnQgc3Vydml2YWwgZXhwZXJpZW5jZTsgaW4gb3RoZXIgd29yZHMsIHRob3NlIHdobyBhcmUgY2Vuc29yZWQgYmVjYXVzZSBvZiBsb3NzIHRvIGZvbGxvdy11cCBhdCBhIGdpdmVuIHBvaW50IGluIHRpbWUgc2hvdWxkIGJlIGFzIGxpa2VseSB0byBoYXZlIGEgc3Vic2VxdWVudCBldmVudCBhcyB0aG9zZSBpbmRpdmlkdWFscyB3aG8gcmVtYWluIGluIHRoZSBzdHVkeS4gW0BDbGFyazIwMDNfSV0KCkEgcmVsYXRlZCBleGFtcGxlIG9uIGNlbnNvcmluZzoKCltzb3VyY2U6IENsYXJrIGV0IGFsLCAyMDAzXShDZW5zLnBuZykKCiMjIyBUcnVuY2F0aW9uCgpUcnVuY2F0aW9uIGlzIGRlZmluZWQgYXMgYSBjb25kaXRpb24gd2hpY2ggc2NyZWVucyBjZXJ0YWluIHN1YmplY3RzIHNvIHRoYXQgdGhlIGludmVzdGlnYXRvciB3aWxsIG5vdCBiZSBhd2FyZSBvZiB0aGVpciBleGlzdGVuY2UgW0BLbGVpbkJvb2tdLiAgIAoKLSoqTGVmdCB0cnVuY2F0aW9uKiogOiBJbiBsZWZ0IHRydW5jYXRpb24sIHNvbWUgKG9yIGFsbCkgaW5kaXZpZHVhbHMgYXJlIG5vdCBmb2xsb3dlZCBmcm9tIHRpbWUgemVybyAod2l0aCByZXNwZWN0IHRvIHRoZSBzdHVkeSB0aW1lIHNjYWxlKSwgYnV0IG9ubHkgZnJvbSBsYXRlciBlbnRyeSB0aW1lcy4gCgpbc291cmNlOiBATW9vcmVCb29rXShMZWZ0VHJ1bmMucG5nKQoKIyMjIENlbnNvcmluZyB2cyBUcnVuY2F0aW9uCgo+IENlbnNvcmluZyBwZXJpb2QgaXMgZGVmaW5lZCBhcyB0aGUgcGVyaW9kIHRoZSBzdHVkeSBwYXJ0aWNpcGFudCBpcyBubyBsb25nZXIgdW5kZXIgb2JzZXJ2YXRpb24sIGJ1dCBoZS9zaGUgKiptYXkgZXhwZXJpZW5jZSB0aGUgZXZlbnQgb2YgaW50ZXJlc3QqKi4KCj4gVHJ1bmNhdGlvbiBwZXJpb2QgaXMgZGVmaW5lZCBhcyB0aGUgcGVyaW9kIHRoZSBzdHVkeSBwYXJ0aWNpcGFudCBpcyBubyBsb25nZXIgdW5kZXIgb2JzZXJ2YXRpb24sIGJ1dCBoZS9zaGUgKipjYW5ub3QgZXhwZXJpZW5jZSB0aGUgZXZlbnQgb2YgaW50ZXJlc3QqKi4KCgojIyMgRXhlcmNpc2UKCjEuIFByb3N0YXRlIGNhbmNlciBwYXRpZW50cyBhcmUgZ2l2ZW4gYSBkcnVnIG9yIHBsYWNlYm8uIFN1cnZpdmFsIHRpbWUgaXMgdGhlIGR1cmF0aW9uIGZyb20gcmVtaXNzaW9uIHRvIHJlbGFwc2UuIFRoZSBzdHVkeSBlbmRzIGF0IDIgeWVhcnMgd2l0aCBzb21lIHBhdGllbnRzIHlldCB0byByZWxhcHNlLiBXaGF0IHR5cGUgb2YgY2Vuc29yaW5nIGRvIHlvdSBvYnNlcnZlIGZvciB0aGVzZSBwYXJ0aWNpcGFudHM/CgogICAgLSBMZWZ0IGNlbnNvcmluZwoKICAgIC0gSW50ZXJ2YWwgY2Vuc29yaW5nCgogICAgLSBSaWdodCBjZW5zb3JpbmcKCiAgICAtIExlZnQgdHJ1bmNhdGlvbgogIAoyLiBXZSBhcmUgaW50ZXJlc3RlZCBpbiBpZGVudGlmeWluZyBwcm9nbm9zdGljIGZhY3RvcnMgZm9yIHRoZSBzdXJ2aXZhbCBvZiBvdmFyaWFuIGNhbmNlciBwYXRpZW50cy4gT25seSBwYXRpZW50cyB3aG8gaGF2ZSBzdXJ2aXZlZCBhdCBsZWFzdCA1IHllYXJzIGFmdGVyIGRpYWdub3NpcyBhcmUgaW5jbHVkZWQgaW4gdGhlIHN0dWR5LiBUeXBlIG9mIGNlbnNvcmluZyBpcwoKICAgIC0gTGVmdCBjZW5zb3JpbmcKCiAgICAtIEludGVydmFsIGNlbnNvcmluZwoKICAgIC0gUmlnaHQgY2Vuc29yaW5nCgogICAgLSBMZWZ0IHRydW5jYXRpb24KICAKMy4gRm9yIHBhdGllbnRzIHdobyBzdGFydCBmZWVsaW5nIGJldHRlciwgdGhlIHBoeXNpY2lhbnMgZGVjaWRlIHRvIGV4Y2x1ZGUgdGhlbSBmcm9tIHRoZSBzdHVkeQoKICAgIC0gUmlnaHQgdHJ1bmNhdGlvbgogIAogICAgLSBSaWdodCBjZW5zb3JpbmcKICAKICAgIC0gSW5mb3JtYXRpdmUgcmlnaHQgdHJ1bmNhdGlvbgogICAgCiAgICAtIEluZm9ybWF0aXZlIHJpZ2h0IGNlbnNvcmluZwogIAojIyBEZXNjcmliaW5nIHN1cnZpdmFsIGRhdGE6IHN1cnZpdmFsICYgaGF6YXJkCgo+YHIgdGV4dF9zcGVjKCJTdXJ2aXZhbCBwcm9iYWJpbGl0eToiLCBiYWNrZ3JvdW5kID0gIiNEMDVBNkUiLCBjb2xvciA9ICJ3aGl0ZSIsIGJvbGQgPSBUKWAgUHJvYmFiaWxpdHkgdGhhdCBhIHBhdGllbnQgc3Vydml2ZXMgZnJvbSB0aGUgZGlhZ25vc2lzICh0aW1lIG9mIG9yaWdpbikgdGltZSB0byBhIHNwZWNpZmljIHRpbWUgcG9pbnQgKnQqIChkZW5vdGVkIGJ5ICpTKHQpKikuCiAgIAo+YHIgdGV4dF9zcGVjKCJIYXphcmQgcHJvYmFiaWxpdHk6IiwgYmFja2dyb3VuZCA9ICIjRDA1QTZFIiwgY29sb3IgPSAid2hpdGUiLCBib2xkID0gVClgIFByb2JhYmlsaXR5IHRoYXQgYSBwYXRpZW50IHdpbGwgaGF2ZSB0aGUgZXZlbiBvZiBpbnRlcmVzdCBhdCB0aW1lICp0KiAoZGVub3RlZCBieSAqaCh0KSopLCBnaXZlbiB0aGF0IHRoZSBpbmRpdmlkdWFsIGhhcyBzdXJ2aXZlZCB1cCB0byB0aW1lICp0Ki4KCiMgS2FwbGFuLU1laWVyIChLTSkgc3Vydml2YWwgZXN0aW1hdGUKCktNIGVzdGltYXRvciAoYS5rLmEuIHByb2R1Y3QgbGltaXQgZXN0aW1hdG9yKSBpcyBhIG5vbi1wYXJhbWV0cmljIHRlY2huaXF1ZSB0byBlc3RpbWF0ZSB0aGUgc3Vydml2YWwgcHJvYmFiaWxpdHkgZnJvbSB0aGUgb2JzZXJ2ZWQgc3Vydml2YWwgdGltZXMgKEthcGxhbiAmIE1laWVyLCAxOTU4KS4gS00gbWV0aG9kIGNvdWxkIGJlIHVzZWQgdG8gb2J0YWluIHN1cnZpdmFsIGluZm9ybWF0aW9uIG9mIGEgc2luZ2xlIHN0dWR5IGdyb3VwIG9yIGJldHdlZW4gZ3JvdXBzLiBMYXRlciBtZWFucywgZm9yIGV4YW1wbGUgd2Ugd2FudCB0byBjb21wYXJlIHRoZSBzdXJ2aXZhbCBwYXR0ZXJuIG9mIHR3byBncm91cHMuIAoKV2UgY2FuIHVzZSBgc3Vydml2YWxgIHBhY2thZ2UgaW4gYFJgIHRvIHBlcmZvcm0gbWFqb3JpdHkgb2YgdGhlIG1ldGhvZHMgaW4gc3Vydml2YWwgYW5hbHlzaXMgbGl0ZXJhdHVyZS4gQSBrZXkgZnVuY3Rpb24gZm9yIHRoZSBhbmFseXNpcyBvZiBzdXJ2aXZhbCBkYXRhIGluIGBSYCBpcyBmdW5jdGlvbiBgU3VydigpYC4gVGhpcyBpcyB1c2VkIHRvIHNwZWNpZnkgdGhlIHR5cGUgb2Ygc3Vydml2YWwgZGF0YSB0aGF0IHdlIHdhbnQgdG8gYW5hbHlzZXMsIG5hbWVseSwgcmlnaHQgY2Vuc29yZWQsIGxlZnQgY2Vuc29yZWQsIGludGVydmFsIGNlbnNvcmVkLiBGb3Igb3VyIGlsbHVzdHJhdGlvbnMsIHdlIHdpbGwgb25seSBjb25zaWRlciByaWdodCBjZW5zb3JlZCBkYXRhIGluIHRoaXMgd29ya3Nob3AuIAoKVGhlIGBSYCBvYmplY3QgY3JlYXRlZCBieSB1c2luZyB0aGlzIGZ1bmN0aW9uIGlzIGEgICoqc3Vydml2YWwgb2JqZWN0KiouIAoKPiBXaGF0IGlzIGEgKipzdXJ2aXZhbCBvYmplY3QqKiBpbiBgUmA/CgpXZSBkZWNsYXJlIGEgKipzdXJ2aXZhbCBvYmplY3QqKiBpbiBgUmAgdXNpbmcgdGhlIG1pbmltYWwgY29tbWFuZCBgU3Vydih0aW1lLCBldmVudClgLCB3aGVyZQoKLSB0aW1lOiBmb2xsb3ctdXAgdGltZSBmb3IgcmlnaHQtY2Vuc29yZWQgZGF0YQotIGV2ZW50OiBldmVudCBpbmRpY2F0b3IgKHVzdWFsbHkgZGVhZC9hbGl2ZSkgCgojIyBLTSBlc3RpbWF0ZS9jdXJ2ZTogc2luZ2xlIGdyb3VwIHN0dWR5Cgpgc3VydmZpdGAgZnVuY3Rpb24gaW4gdGhlIGBzdXJ2aXZhbGAgcGFja2FnZSBjYW4gYmUgdXNlZCB0byBvYnRhaW4gS00gZXN0aW1hdGUgYW5kIHRvIGNyZWF0ZSBzdXJ2aXZhbCBjdXJ2ZXMuIFRoZSBmaXJzdCBhcmd1bWVudCBvZiB0aGUgYHN1cnZmaXRgIGZ1bmN0aW9uIGlzIGEgZm9ybXVsYSAoJFkgXHNpbSBYJCksIHdoZXJlIGluIHRoZSBsZWZ0LWhhbmQgc2lkZSB3ZSBzdGF0ZSB0aGUgdHlwZSBvZiBzdXJ2aXZhbCBkYXRhIHVzaW5nIHRoZSBmdW5jdGlvbiBgU3VydigpYCBhbmQgaW4gdGhlIHJpZ2h0LWhhbmQgc2lkZSBncm91cGluZyBpbmZvcm1hdGlvbiBhcmUgcHJvdmlkZWQuIAoKPiBXaGF0IGFyZSB0aGVzZSBgUmAgY29kZXMgaW1wbHk/CgotIGBzdXJ2Zml0KFN1cnYodGltZSwgZXZlbnQpIH4gMSlgCgotIGBzdXJ2Zml0KFN1cnYodGltZSwgZXZlbnQpIH4gVHJlYXRtZW50KWAKCk9rLi4uIExldCdzIHB1dCBhbGwgdGhlc2UgaW50byBwcmFjdGljZSBub3chIFdlJ2xsIGNvbnNpZGVyIHR3byBleGFtcGxlcyBmcm9tIG92YXJpYW4gY2FuY2VyIHJlc2VhcmNoLiBPbmUgZnJvbSB0aGUgc3R1ZHkgdGhhdCB3YXMgZGlzY3Vzc2VkIGluIFtARWRtb25zb24xOTc5XSBhbmQgdGhlIG90aGVyIGZyb20gQm93dGVsbCdzIGxhYiBbQEFsc29wXzIwMTJdLiBMYXRlciBzdHVkeSB3YXMgZGlzY3Vzc2VkIGluIHRoZSBncm91cCBjb21wYXJpc29uIHdvcmtzaG9wLgoKIyBDYXNlIHN0dWRpZXMKIyMgU3R1ZHkgMTogT3ZhcmlhbiBjYW5jZXIgc3R1ZHkgW0BFZG1vbnNvbjE5NzldCiAKV2UnbGwgYmUgdXNpbmcgdGhlIGBvdmFyaWFuYCBjYW5jZXIgZGF0YSBzZXQgcHJvdmlkZWQgaW4gdGhlIGBzdXJ2aXZhbGAgcGFja2FnZSBhcyB0aGUgZmlyc3QgZXhhbXBsZS4gVGhpcyBkYXRhIHNldCBwcm92aWRlcyBzdXJ2aXZhbCBpbmZvcm1hdGlvbiBpbiBhIHJhbmRvbWlzZWQgdHJpYWwgY29tcGFyaW5nIHR3byB0cmVhdG1lbnRzIGZvciBvdmFyaWFuIGNhbmNlciBbQEVkbW9uc29uMTk3OV0uIFRoZXJlIGFyZSA2IHZhcmlhYmxlcyBpbiB0aGUgZGF0YSBzZXQuIFRoZXkgYXJlOgoKMS4gYGZ1dGltZWAgLSBGb2xsb3cgdXAgdGltZSAoc3Vydml2YWwgdGltZSkKMi4gYGZ1c3RhdGAgLSBFdmVudCBvZiBpbnRlcmVzdCBvY2N1cnJlZCBvciBjZW5zb3JlZCAKMy4gYGFnZWAgLSBBZ2Ugb2YgdGhlIHN0dWR5IHBhcnRpY2lwYW50cwo0LiBgcmVzaWQuZHNgIC0gUmVzaWR1YWwgZGlzZWFzZSBzdGF0dXMgKDE9bm8sIDI9eWVzKQo1LiBgcnhgIC0gVHJlYXRtZW50IGdyb3VwICh0d28gdHJlYXRtZW50cykKNi4gYGVjb2cucHNgIC0gU3RhbmRhcmRpc2VkIEVDT0cgcGVyZm9ybWFuY2Ugc3RhdHVzICgxIGJlaW5nIGdvb2QgYW5kIDIgZm9yIG5vdCkKCiMjIyBMb2FkaW5nIHJlcXVpcmVkIGBSYCBwYWNrYWdlcyAmIGZ1bmN0aW9ucwoKYGBge3IsIGVjaG89VCwgbWVzc2FnZT1GQUxTRSwgd2FybmluZz1GQUxTRX0KIyBGdW5jdGlvbiB0byBpbnN0YWxsJmxvYWQvbG9hZCByZXF1aXJlZCBSIHBhY2thZ2VzCmluc3RhbGxfbG9hZCA8LSBmdW5jdGlvbiAocGFja2FnZTEsIC4uLikgIHsgICAKICBwYWNrYWdlcyA8LSBjKHBhY2thZ2UxLCAuLi4pCiAgZm9yKHBhY2thZ2UgaW4gcGFja2FnZXMpewogICAgaWYocGFja2FnZSAlaW4lIHJvd25hbWVzKGluc3RhbGxlZC5wYWNrYWdlcygpKSkKICAgICAgZG8uY2FsbCgnbGlicmFyeScsIGxpc3QocGFja2FnZSkpCiAgICBlbHNlIHsKICAgICAgaW5zdGFsbC5wYWNrYWdlcyhwYWNrYWdlKQogICAgICBkby5jYWxsKCJsaWJyYXJ5IiwgbGlzdChwYWNrYWdlKSkKICAgIH0KICB9IAp9CgojIFJlcXVpcmVkIFIgcGFja2FnZXMKcmVxdWlyZWRfUl9wYWNrYWdlcyA8LSBjKCJzdXJ2aXZhbCIsICJzdXJ2bWluZXIiLCAidGlkeXZlcnNlIiwgInBzeWNoIiwgCiAgICAgICAgICAgICAgICAgICAgICAgICAicmVhZHhsIiwgImthYmxlRXh0cmEiKQoKIyBJbnN0YWxsL2xvYWQgcmVxdWlyZWQgUiBwYWNrYWdlcwppbnN0YWxsX2xvYWQocmVxdWlyZWRfUl9wYWNrYWdlcykKYGBgCgojIyMgTG9hZGluZyBkYXRhIGZyb20gYHN1cnZpdmFsYCBwYWNrYWdlCgpgYGB7ciwgZXZhbD1GQUxTRSwgZWNobz1GLCBtZXNzYWdlPUZBTFNFLCB3YXJuaW5nPUZBTFNFLCBjb21tZW50PSIifQojIHdyaXRleGw6OndyaXRlX3hsc3gob3ZhcmlhbiwgIi9Vc2Vycy9qYXlhd2FyZGFuYW1hZGF3YS9EZXNrdG9wLzEuUEVURVJNQUMvMi5XT1JLL0xBQlMvMS5HZW5lcmFsLzEuV29ya3Nob3BzLzEuU3Vydml2YWwgQW5hbHlzaXMvRGF0YS9vdmFyaWFuLnhsc3giKQpgYGAKCmBgYHtyLCBlY2hvPVQsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIGNvbW1lbnQ9IiJ9CiMgdXNpbmcgdGhlIHN1cnZpdmFsIFIgcGFja2FnZSAKb3Zhcmlhbl9kYXRhIDwtIG92YXJpYW4KCiMgU3RydWN0dXJlIG9mIHlvdXIgZGF0YQpzdHIob3Zhcmlhbl9kYXRhKQoKIyBGYWNvdG9yaXNhdGlvbiBvZiB2YXJpYWJsZXMKb3Zhcmlhbl9kYXRhJHJ4IDwtIGZhY3RvcihvdmFyaWFuX2RhdGEkcngsIGxldmVscyA9IGMoIjEiLCAiMiIpKQpvdmFyaWFuX2RhdGEkcmVzaWQuZHMgPC0gZmFjdG9yKG92YXJpYW5fZGF0YSRyZXNpZC5kcywgbGV2ZWxzID0gYygiMSIsICIyIiksIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxhYmVscyA9IGMoIk5vIiwgIlllcyIpKQpvdmFyaWFuX2RhdGEkZWNvZy5wcyA8LSBmYWN0b3Iob3Zhcmlhbl9kYXRhJGVjb2cucHMsIGxldmVscyA9IGMoIjEiLCAiMiIpLCAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsYWJlbHMgPSBjKCJHb29kIiwgIkJhZCIpKQoKIyBUYWtlIGEgbG9vayBhdCBvdmFyaWFuIGNhbmNlciBkYXRhCmRwbHlyOjpnbGltcHNlKG92YXJpYW5fZGF0YSkKCiMgRnVuY3Rpb24gdG8gaGF2ZSBvdmVybGF5ZWQgcGxvdHMKcGxvdF9tdWx0aV9oaXN0b2dyYW0gPC0gZnVuY3Rpb24oZGYsIGZlYXR1cmUsIGxhYmVsX2NvbHVtbikgewogICAgcGx0IDwtIGdncGxvdChkZiwgYWVzKHg9ZXZhbChwYXJzZSh0ZXh0PWZlYXR1cmUpKSwgZmlsbD1ldmFsKHBhcnNlKHRleHQ9bGFiZWxfY29sdW1uKSkpKSArCiAgICBnZW9tX2hpc3RvZ3JhbShhbHBoYT0wLjcsIHBvc2l0aW9uPSJpZGVudGl0eSIsIGFlcyh5ID0gLi5kZW5zaXR5Li4pLCBjb2xvcj0iYmxhY2siKSArCiAgICBnZW9tX2RlbnNpdHkoYWxwaGE9MC43KSArCiAgICBsYWJzKHg9ZmVhdHVyZSwgeSA9ICJEZW5zaXR5IikKICAgIHBsdCArIGd1aWRlcyhmaWxsPWd1aWRlX2xlZ2VuZCh0aXRsZT1sYWJlbF9jb2x1bW4pKQp9CgojIE92ZXJsYXkgcGxvdCBvZiBoaXN0b2dyYW0gYW5kIHRoZSBkZW5zaXRpZXMgCnBsb3RfbXVsdGlfaGlzdG9ncmFtKG92YXJpYW5fZGF0YSwgJ2Z1dGltZScsICdyeCcpCgojIERlc2NyaXB0aXZlIHN0YXRpc3RpY3MKZGVzY3JpYmVCeShvdmFyaWFuX2RhdGEkZnV0aW1lLCBvdmFyaWFuX2RhdGEkcngsIG1hdCA9IFQpWy1jKDEsIDMsIDgsIDksIDEzLCAxNCldICU+JSAKa2FibGUoZGlnaXRzID0gMikgJT4lIAogIGthYmxlX3N0eWxpbmcoYm9vdHN0cmFwX29wdGlvbnMgPSBjKCJzdHJpcGVkIiwgImhvdmVyIiwgImNvbmRlbnNlZCIpLCAKICAgICAgICAgICAgICAgIGZ1bGxfd2lkdGggPSBGLCAKICAgICAgICAgICAgICAgIHBvc2l0aW9uID0gImxlZnQiCiAgICAgICAgICAgICAgICApCmBgYAoKIyMjIEtNIGN1cnZlcwoKYGBge3IsIGVjaG89VCwgbWVzc2FnZT1GQUxTRSwgd2FybmluZz1GQUxTRSwgY29tbWVudD0iIn0KCiMgTGV0IHVzIGNvbnZlcnQgdGhlIGBWaXRhbCBzdGF0dXNgIHZhcmlhYmxlIHRvIGEgbnVtZXJpYyB2YXJpYWJsZQpvdmFyaWFuX2RhdGEkZnV0aW1lIDwtIGFzLm51bWVyaWMob3Zhcmlhbl9kYXRhJGZ1dGltZSkKCiMgS00gY3VydmU6IHBvb2xpbmcgYm90aCBncm91cHMKS01fYWxsIDwtIHN1cnZmaXQoU3VydihmdXRpbWUsIGZ1c3RhdCkgfiAxLCBkYXRhID0gb3Zhcmlhbl9kYXRhKQpLTV9hbGwKCiMgQWx0ZXJuYXRpdmVseQpzdXJ2X21lZGlhbihLTV9hbGwpCgojIE9idGFpbmluZyBLTSBjdXJ2ZQpwbG90KEtNX2FsbCkKCnBsb3QoS01fYWxsLCB4bGFiID0gIkZ1dGltZSIsIHlsYWIgPSAiU3Vydml2YWwgcHJvYmFiaWxpdHkiLCBidHkgPSJuIiwgbHdkPTIsIAogICAgIGNvbCA9ICJkYXJrYmx1ZSIsIG1haW4gPSAiRGVmYXVsdCBwbG90dGluZyBtZXRob2QiLCBjZXgubWFpbiA9IDAuOCkKCmBgYApgYGB7ciwgZWNobz1ULCBtZXNzYWdlPUZBTFNFLCB3YXJuaW5nPUZBTFNFLCBjb21tZW50PSIifQojIE5pY2VyIHBsb3Qgd2l0aCBtb3JlIGluZm9ybWF0aW9uIHVzaW5nIHN1cnZtaW5lciBwYWNrYWdlCmdnc3VydnBsb3QoS01fYWxsLCAKICAgICAgICAgICBkYXRhID0gb3Zhcmlhbl9kYXRhLCAKICAgICAgICAgICBjb25mLmludCA9IFQsIAogICAgICAgICAgIHJpc2sudGFibGUgPSBULCAKICAgICAgICAgICBzdXJ2Lm1lZGlhbi5saW5lID0gImh2IiwgCiAgICAgICAgICAgbGVnZW5kLnRpdGxlID0gIiIsIAogICAgICAgICAgIGxlZ2VuZC5sYWJzID0gYygiQWxsIiksIAogICAgICAgICAgIHhsYWI9J0Z1dGltZScsIAogICAgICAgICAgIGxlZ2VuZCA9IGMoMC42LDAuOCkKICAgICAgICAgICApIAoKIyBQbG90dGluZyB0aGUgaGF6YXJkIGZ1bmN0aW9uCmdnc3VydnBsb3QoS01fYWxsLCAKICAgICAgICAgICBjb25mLmludCA9IFRSVUUsIAogICAgICAgICAgIHJpc2sudGFibGUgPSBUUlVFLCAKICAgICAgICAgICBmdW4gPSAiY3VtaGF6IgogICAgICAgICAgICkKYGBgCgoKIyMjIEtNIGN1cnZlcyBmb3IgYm90aCBncm91cHMKCmBgYHtyLCBlY2hvPVQsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIGNvbW1lbnQ9IiJ9CgojIEtNIGN1cnZlcyBmb3IgYm90aCBncm91cHMKS01fZ3JvdXBzIDwtIHN1cnZmaXQoU3VydihmdXRpbWUsIGZ1c3RhdCkgfiByeCwgZGF0YSA9IG92YXJpYW5fZGF0YSkKS01fZ3JvdXBzCgojIE9idGFpbmluZyBLTSBjdXJ2ZQpwbG90KEtNX2dyb3VwcywgeGxhYiA9ICJPU0R4IChtb250aHMpIiwgeWxhYiA9ICJTdXJ2aXZhbCBwcm9iYWJpbGl0eSIsIGJ0eSA9ICJuIiwgCiAgICAgY29sID0gImRhcmtibHVlIiwgbWFpbiA9ICJEZWZhdWx0IHBsb3R0aW5nIG1ldGhvZCIsIGNleC5tYWluID0gMC44KQpgYGAKCmBgYHtyLCBlY2hvPVQsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIGNvbW1lbnQ9IiJ9CgojIE5pY2VyIHBsb3Qgd2l0aCBtb3JlIGluZm9ybWF0aW9uIHVzaW5nIHN1cnZtaW5lciBwYWNrYWdlCmdnc3VydnBsb3QoS01fZ3JvdXBzLCAKICAgICAgICAgICBkYXRhID0gb3Zhcmlhbl9kYXRhLCAKICAgICAgICAgICBjb25mLmludCA9IFQsIAogICAgICAgICAgIHJpc2sudGFibGUgPSBULCAgCiAgICAgICAgICAgc3Vydi5tZWRpYW4ubGluZSA9ICJodiIsIAogICAgICAgICAgIGxlZ2VuZC50aXRsZSA9ICIiLCAKICAgICAgICAgICBsZWdlbmQubGFicyA9IGMoIlRyZWF0bWVudCAxIiwgIlRyZWF0bWVudCAyIiksIAogICAgICAgICAgIHhsYWI9J0Z1dGltZScsIAogICAgICAgICAgIGxlZ2VuZCA9IGMoMC4yLDAuMikKICAgICAgICAgICApIAoKIyBQbG90dGluZyB0aGUgaGF6YXJkIGZ1bmN0aW9ucwpnZ3N1cnZwbG90KEtNX2dyb3VwcywgCiAgICAgICAgICAgY29uZi5pbnQgPSBUUlVFLCAKICAgICAgICAgICByaXNrLnRhYmxlID0gVFJVRSwgCiAgICAgICAgICAgZnVuID0gImN1bWhheiIKICAgICAgICAgICApCgpgYGAKCiMjIFN0dWR5IDI6IE92YXJpYW4gY2FuY2VyIHN0dWR5IFtAQWxzb3BfMjAxMl0KCldlJ2xsIGNvbnNpZGVyIHRoZSBvdmVyYWxsIHN1cnZpdmFsIGluZm9ybWF0aW9uIGluIHRoaXMgc3R1ZHkuCgojIyMgTG9hZGluZyBkYXRhCmBgYHtyLCBlY2hvPVQsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIGNvbW1lbnQ9IiJ9CkpDT19vcmlnIDwtIHJlYWR4bDo6cmVhZF9leGNlbCgiZGF0YS9kYXRhX2thdGhyeW4ueGxzeCIsIHNoZWV0ID0gMSkKCiMgR2V0IGEgZ2xpbXBzZSBvZiB5b3VyIGRhdGEKZ2xpbXBzZShKQ09fb3JpZykKCnN0cihKQ09fb3JpZykKCiMgUmVwbGFjaW5nIE5BcyB3aXRoICJOZWdhdGl2ZSIKSkNPX2RhdGEgPC0gSkNPX29yaWcgJT4lIAogICAgICAgICAgICAgICAgcmVwbGFjZV9uYShsaXN0KGBHZW5lIG11dGF0aW9uIGZvdW5kIGluYCA9ICJOZWdhdGl2ZSIpKQoKIyBGYWN0b3JpbmcgIkdlbmUgbXV0YXRpb24gZm91bmQgaW4iIGNvbHVtbgpKQ09fZGF0YSRgR2VuZSBtdXRhdGlvbiBmb3VuZCBpbmAgPC0gZmFjdG9yKEpDT19kYXRhJGBHZW5lIG11dGF0aW9uIGZvdW5kIGluYCkKCiMgUmVwbGFjaW5nIEJSQ0ExIGFuZCBCUkNBMiBhcyBjb21iaW5lZCBwb3NpdGl2ZQpKQ09fZGF0YSA8LSBKQ09fZGF0YSAlPiUgbXV0YXRlKGBHZW5lIG11dGF0aW9uIGZvdW5kIGluYCA9IHJlY29kZShgR2VuZSBtdXRhdGlvbiBmb3VuZCBpbmAsICJCUkNBMSI9IkNvbWJpbmVkX3Bvc2l0aXZlIiwgIkJSQ0EyIj0iQ29tYmluZWRfcG9zaXRpdmUiKSkKCiMgQ2hhbmdpbmcgdGhlIGNvbHVtbiBuYW1lCm5hbWVzKEpDT19kYXRhKVsyMV0gPC0gIk11dGF0aW9uX3N0YXR1cyIKCiMgRmlsdGVyaW5nIG9ubHkgY29tYmluZWQgcG9zaXRpdmUgYW5kIG5lZ2F0aXZlIG9ic2VydmF0aW9ucyAmIG9ubHkgb3ZlcmFsbCBzdXJ2aXZhbApKQ09fZmluYWwgPC0gSkNPX2RhdGEgJT4lIAogICAgICAgICAgICAgICAgZmlsdGVyKE11dGF0aW9uX3N0YXR1cyAhPSBjKCJVViIpLCAKICAgICAgICAgICAgICAgICAgICAgICBTdGF0dXMgIT0gYygiUEYiKSkKCiMgUmVwbGFjaW5nIEQgYW5kIFAgdG8gMSAoZGVhZCkgYW5kIDAgKGFsaXZlKQpKQ09fZmluYWwgPC0gSkNPX2ZpbmFsICU+JSBtdXRhdGUoU3RhdHVzID0gcmVjb2RlKFN0YXR1cywgIkQiPTEsICJQIj0yKSkKCiMgR2V0dGluZyBmaW5hbCBkYXRhIHNldApKQ09fZmluYWwkTXV0YXRpb25fc3RhdHVzIDwtIGZhY3RvcihKQ09fZmluYWwkTXV0YXRpb25fc3RhdHVzKQpKQ09fZmluYWwkU3RhdHVzIDwtIGFzLm51bWVyaWMoSkNPX2ZpbmFsJFN0YXR1cykgCmBgYAojIyMgS00gY3VydmVzIGZvciBib3RoIGdyb3VwcwpgYGB7ciwgZWNobz1ULCBtZXNzYWdlPUZBTFNFLCB3YXJuaW5nPUZBTFNFLCBjb21tZW50PSIifQoKIyBLTSBjdXJ2ZXMgZm9yIGJvdGggZ3JvdXBzCktNX2dyb3Vwc19BbHNvcCA8LSBzdXJ2Zml0KFN1cnYoT1NEeCwgU3RhdHVzKSB+IE11dGF0aW9uX3N0YXR1cywgZGF0YSA9IEpDT19maW5hbCkKS01fZ3JvdXBzX0Fsc29wCgp0YWJsZShKQ09fZmluYWwkU3RhdHVzKQoKIyBPYnRhaW5pbmcgS00gY3VydmUKZ2dzdXJ2cGxvdChLTV9ncm91cHNfQWxzb3AsIAogICAgICAgICAgIGRhdGEgPSBKQ09fZmluYWwsIAogICAgICAgICAgIGNvbmYuaW50ID0gVCwgCiAgICAgICAgICAgcmlzay50YWJsZSA9IFQsICAKICAgICAgICAgICBzdXJ2Lm1lZGlhbi5saW5lID0gImh2IiwgCiAgICAgICAgICAgbGVnZW5kLnRpdGxlID0gIiIsIAogICAgICAgICAgIGxlZ2VuZC5sYWJzID0gYygiUG9zaXRpdmUiLCAiTmVnYXRpdmUiKSwgCiAgICAgICAgICAgeGxhYj0nRnV0aW1lJywgCiAgICAgICAgICAgbGVnZW5kID0gYygwLjIsMC4yKQogICAgICAgICAgICkgCmBgYAoKClNvLCBub3cgd2Uga25vdyBob3cgdG8gb2J0YWluIEtNIGN1cnZlcyB1c2luZyBgUmAuIE5leHQgb2J2aW91cyBxdWVzdGlvbiBpcywKCj4gSG93IGNhbiB3ZSB0ZXN0IHRoZSBvYnNlcnZlZCBkaWZmZXJlbmNlIGluIHN1cnZpdmFsIGlzIHN0YXRpc3RpY2FsbHkgc2lnbmlmaWNhbnQgb3Igbm90PwoKRm9yIHRoaXMgcHVycG9zZSwgd2UgY291bGQgdXNlIHRoZSB3ZWxsIGVzdGFibGlzaGVkIGxvZy1yYW5rIHRlc3QuIEl0IGlzIGEgc2ltcGxlIHRlc3QgdG8gYW5zd2VyIHRoZSBhYm92ZSBxdWVzdGlvbi4gV2hhdCBpcyBsb2ctcmFuayB0ZXN0PwoKIyBMb2ctcmFuayB0ZXN0CgpMb2ctcmFuayAoTWFudGVsLUhhZW5zemVsKSB0ZXN0IGlzIGEgbm9uLXBhcmFtZXRyaWMgbWV0aG9kIGZvciB0ZXN0aW5nIHRoZSBoeXBvdGhlc2lzOgoKJEhfMCA6IGRpc3RyaWJ1dGlvbiBcOyBvZiBcOyBzdXJ2aXZhbCBcOyB0aW1lcyBcOyBpcyBcOyB0aGUgXDsgc2FtZSAgXDsgZm9yIFw7IHRoZSBcOyBncm91cHMkICAKCiRIXzEgOiBpdCBcOyBpcyBcOyBub3RcOyB0aGUgXDsgc2FtZSQgCgpUaGlzIGlzIGEgbGFyZ2Utc2FtcGxlIGNoaS1zcXVhcmUgdGVzdCBhbmQgaXQgcHJvdmlkZXMgYW4gb3ZlcmFsbCBjb21wYXJpc29uIG9mIHRoZSBLTSBjdXJ2ZXMgYmVpbmcgY29tcGFyZWQuIFRoZSB0ZXN0aW5nIG51bGwgaHlwb3RoZXNpcyBpcyB0aGF0IHRoZXJlIGlzIG5vIG92ZXJhbGwgZGlmZmVyZW5jZSBiZXR3ZWVuIHRoZSB0d28gc3Vydml2YWwgY3VydmVzLiBVbmRlciB0aGlzIG51bGwgaHlwb3RoZXNpcywgdGhlIGxvZ+KAk3Jhbmsgc3RhdGlzdGljIGlzIGRpc3RyaWJ1dGVkIGFwcHJveGltYXRlbHkgY2hpLXNxdWFyZSB3aXRoIG9uZSBkZWdyZWUgb2YgZnJlZWRvbS4gIAoKKipOb3RlOioqIAoxLiBUZXN0IGlzIG9ubHkgdmFsaWQgaWYgdGhlIHJhdGlvIGJldHdlZW4gdHdvIGhhemFyZHMgb2YgdGhlIGdyb3VwcyBpcyBhIGNvbnN0YW50ISAocHJvcG9ydGlvbmFsIGhhemFyZHMgYXNzdW1wdGlvbikKCjIuIEl0IHBsYWNlcyB0aGUgc2FtZSB3ZWlnaHQgb24gYWxsIGZvbGxvdy11cCB0aW1lcwoKVGhlIGBzdXJ2aXZhbGAgcGFja2FnZSBwcm92aWRlcyB0aGUgZnVuY3Rpb24gYHN1cnZkaWZmYCB0byBwZXJmb3JtIGxvZy1yYW5rIHRlc3RzIGZvciBkaWZmZXJlbmNlcyBiZXR3ZWVuIHN1cnZpdmFsIGN1cnZlcy4gU3ludGF4IGZvciB0aGlzIGZ1bmN0aW9uIGlzIHByZXR0eSBzaW1pbGFyIHRvIHRoZSBgc3VydmZpdGAgZnVuY3Rpb24gdGhhdCB3ZSB1c2VkIGVhcmxpZXIuIAoKIyMgQ2FzZSBzdHVkeSAxCmBgYHtyLCBlY2hvPVQsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIGNvbW1lbnQ9IiJ9CnN1cnZkaWZmKFN1cnYoZnV0aW1lLCBmdXN0YXQpIH4gcngsIGRhdGEgPSBvdmFyaWFuX2RhdGEpCmBgYApXZSBvYnRhaW4gYSBub24tc2lnbmlmaWNhbnQgZGlmZmVyZW5jZSBpbiB0aGUgc3Vydml2YWwgY3VydmVzIGJldHdlZW4gdGhlIHR3byB0cmVhdG1lbnQgZ3JvdXBzLgoKIyMgQ2FzZSBzdHVkeSAyCmBgYHtyLCBlY2hvPVQsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIGNvbW1lbnQ9IiJ9CnN1cnZkaWZmKFN1cnYoT1NEeCwgU3RhdHVzKSB+IE11dGF0aW9uX3N0YXR1cywgZGF0YSA9IEpDT19maW5hbCkKYGBgCldlIG9idGFpbiBhIGhpZ2hseSBzaWduaWZpY2FudCBkaWZmZXJlbmNlIGluIHRoZSBzdXJ2aXZhbCBjdXJ2ZXMgYmV0d2VlbiBCUkNBMS8yIHBvc2l0aXZlIGFuZCBuZWdhdGl2ZSBncm91cHMuCgojIFdlaWdodGVkIExvZy1yYW5rIHRlc3RzIAoKV2VpZ2h0ZWQgTG9nLXJhbmsgdGVzdHMgYXJlIHVzZWZ1bCB3aGVuIHRoZSBzdGFuZGFyZCBhc3N1bXB0aW9ucyBvZiB0aGUgZ2VuZXJhbCBMb2ctcmFuayB0ZXN0IGFyZSB2aW9sYXRlZC4gCgojIyBQZXRvIGFuZCBQZXRvIG1vZGlmaWVkIEdlaGFuLVdpbGNveG9uIHRlc3QKClRoaXMgaXMgYSB2ZXJzaW9uIG9mIExvZy1yYW5rIHRlc3QgdGhhdCBzaXRzIGJyb2FkbHkgdW5kZXIgdGhlIEctcmhvIGZhbWlseSBvZiBIYXJyaW5ndG9uIGFuZCBGbGVtaW5nIHRlc3RzIChbQEhhcnJpbmd0b24xOTgyXSkuIEl0IGlzIGEgZ29vZCBhbHRlcm5hdGl2ZSB0byBjb25zaWRlciB3aGVuOgoKLSBoYXphcmQgZnVuY3Rpb25zIGFyZSBub3QgcHJvcG9ydGlvbmFsCgotIGJldHRlciB3aGVuIHlvdSBoYXZlIG1vcmUgZXZlbnQgdGltZXMgZWFybGllcgoKVGhlIFBldG8gJiBQZXRvIG1vZGlmaWVkIEdlaGFuLVdpbGNveG9uIHRlc3QgaXMgYWdhaW4gY29tcHV0ZWQgdXNpbmcgZnVuY3Rpb24gYHN1cnZkaWZmKClgOyBob3dldmVyLCB3ZSBuZWVkIHRvIHNldCBhcmd1bWVudCBgcmhvYCB0byAxLgoKYGBge3IsIGVjaG89VCwgbWVzc2FnZT1GQUxTRSwgd2FybmluZz1GQUxTRSwgY29tbWVudD0iIn0Kc3VydmRpZmYoU3VydihmdXRpbWUsIGZ1c3RhdCkgfiByeCwgcmhvID0gMSwgZGF0YSA9IG92YXJpYW5fZGF0YSkKYGBgCgpTaW1pbGFyIGNvbmNsdXNpb24gYXMgZWFybGllci4KCgo+IFdoaWNoIG9mIHRoZSAyIHRlc3RzIHNob3VsZCBiZSBwcmVmZXJyZWQ/CgotIGlmIHN1cnZpdmFsIGN1cnZlcyBjcm9zcywgYm90aCB0ZXN0cyBhcmUgbm90IG9wdGltYWwKCi0gY2hlY2sgaWYgdGhlIHBycG9ydGlvbmFsIGhhemFyZCBhc3N1bXB0aW9ucyBpcyBzZXJpb3VzbHkgdmlvbGF0ZWQgKGhpbnQ6IHVzZSBwcm9wb3J0aW9uYWwgaGF6YXJkcyBwbG90KQoKICAtIExvZy1yYW5rIHRlc3QgaXMgdGhlIG1vc3QgcG93ZXJmdWwgdGVzdCB3aGVuIHByb3BvcnRpb25hbGl0eSBhc3N1bXB0aW9uIGlzIHZhbGlkCiAgCiAgLSBvdGhlcndpc2UgdXNlIHRoZSB3ZWlnaHRlZCBtZXRob2QKCgojIFN0cmF0aWZpZWQgbG9nLXJhbmsgdGVzdAoKU3RyYXRpZmllZCBsb2ctcmFuayB0ZXN0IGlzIGFuIGV4dGVuc2lvbiBvZiB0aGUgbG9nLXJhbmsgdGVzdCB0byBpbmNvcnBvcmF0ZSBjb250cm9sbGluZyB2YXJpYWJsZShzKSB0byB0ZXN0IHRoZSBlZmZlY3RpdmUgZGlmZmVyZW5jZSBiZXR3ZWVuIHN1cnZpdmFsIGN1cnZlcyBvZiB0aGUgdGhlIHZhcmlhYmxlIG9mIGludGVyZXN0LiBGb3IgZXhhbXBsZSwgbGV0IHVzIGFzc3VtZSB0aGF0IHdlIGhhdmUgdHdvIHRyZWF0bWVudCBncm91cHMgKEEgJiBCKSBhbmQgd2Ugd2FudCB0byBjb250cm9sIGZvciBnZW5kZXIgKG1hbGUgJiBmZW1hbGUpLiBXZSBtYXkgdXNlIHN0cmF0aWZpZWQgbG9nLXJhbmsgdGVzdCBpbiB0aGlzIGNhc2UgdG8gYXNzZXNzIHRoZSBzaWduaWZpY2FuY2Ugb2YgdGhlIHN1cnZpdmFsIGN1cnZlcyBvZiB0aGUgdHdvIHRyZWF0bWVudCBncm91cHMgY29udHJvbGxpbmcgZm9yIHRoZSB2YXJpYWJsZSBnZW5kZXIuIFRodXMsIGl0IHByb3ZpZGVzIGEgbWV0aG9kIG9mIHRlc3RpbmcgdGhlIGVxdWl2YWxlbmNlIG9mIHN1cnZpdmFsIGN1cnZlcyBjb250cm9sbGluZyBmb3IgdGhlIHN0cmF0aWZpZWQgdmFyaWFibGUgW0BLbGVpbkJvb2tdLgoKIyMgUGVyZm9ybWluZyBzdHJhdGlmaWVkIGxvZy1yYW5rIHRlc3QKCmBgYHtyLCBlY2hvPVQsIG1lc3NhZ2U9RkFMU0UsIHdhcm5pbmc9RkFMU0UsIGNvbW1lbnQ9IiJ9CiMgT2J0YWluaW5nIHN1cnZpdmFsIGN1cnZlcwpLTV9zdHJhdGEgPC0gc3VydmZpdChTdXJ2KE9TRHgsIFN0YXR1cykgfiBNdXRhdGlvbl9zdGF0dXMgKyBzdHJhdGEoU3VidHlwZSksIGRhdGEgPSBKQ09fZmluYWwpCiNLTV9zdHJhdGEKCiMgUGxvdHRpbmcgS00gc3Vydml2YWwgY3VydmVzCmdnc3VydnBsb3QoS01fc3RyYXRhLCBkYXRhID0gSkNPX2ZpbmFsKQogICAgICAgICAgICAgICAgICAgICAgICAgICAgIAojIFN0cmF0aWZpZWQgbG9nLXJhbmsgdGVzdApzdXJ2ZGlmZihTdXJ2KE9TRHgsIFN0YXR1cykgfiBNdXRhdGlvbl9zdGF0dXMgKyBzdHJhdGEoU3VidHlwZSksIGRhdGEgPSBKQ09fZmluYWwpCmBgYAoKVGhlIHRlc3QgcmVzdWx0cyBpbmRpY2F0ZSB0aGF0IGV2ZW4gYWZ0ZXIgYWRqdXN0aW5nIGZvciB0aGUgcG9zc2libGUgY29uZm91bmRpbmcgdmFyaWFibGUgU3VidHlwZSwgdGhlcmUgaXMgYSBzdGF0aXN0aWNhbGx5IHNpZ25pZmljYW50IGRpZmZlcmVuY2UgYmV0d2VlbiB0aGUgc3Vydml2YWwgY3VydmVzIG9mIHRoZSB0d28gZ3JvdXBzLgoKIyBFeGVyY2lzZQoKQ29uc2lkZXIgdGhlIHZhcmlhYmxlIGByZXNpZC5kc2AgKHJlc2lkdWFsIGRpc2Vhc2UpIGluIHRoZSBgb3ZhcmlhbmAgZGF0YSBzZXQgKGNhc2Ugc3R1ZHkgMSkgd2hlbiBhbnN3ZXJpbmcgdGhlIGZvbGxvd2luZyBxdWVzdGlvbnMuCgoxLiBEcmF3IEtNIGN1cnZlcy4gQ29tbWVudCBvbiB0aGUgc3Vydml2YWwgcGF0dGVybnMgb2YgdGhlIHR3byBncm91cHMgKHJlc2lkdWFsIGRpc2Vhc2UgWWVzIHZzLiBObykuCjIuIElzIHRoZXJlIGEgc2lnbmlmaWNhbnQgZGlmZmVyZW5jZSBiZXR3ZWVuIHRoZSBzdXJ2aXZhbCBjdXJ2ZXM/ICAKMy4gUGVyZm9ybSBhIHN0cmF0aWZpZWQgbG9nLXJhbmsgdGVzdCB0byBhc3Nlc3MgdGhlIHN1cnZpdm9yIHJlbGF0aW9uc2hpcCBiZXR3ZWVuIGByZXNpZC5kc2AgYW5kIHN1cnZpdmFsIHRpbWVzIGNvbnRyb2xsaW5nIGZvciB0aGUgdmFyaWFibGUgYGFnZWdycGAuIENvbW1lbnQgb24gdGhlIHJlc3VsdHMuCgojIFJlZmVyZW5jZXMK</div>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("SurvivalAnalysis_I.Rmd");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
