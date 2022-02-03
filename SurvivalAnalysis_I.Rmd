@@ -420,7 +420,7 @@ JCO_final <- JCO_data %>%
                        Status != c("PF"))
 
 # Replacing D and P to 1 (dead) and 0 (alive)
-JCO_final <- JCO_final %>% mutate(Status = recode(Status, "D"=1, "P"=2))
+JCO_final <- JCO_final %>% mutate(Status = recode(Status, "D"=1, "P"=0))
 
 # Getting final data set
 JCO_final$Mutation_status <- factor(JCO_final$Mutation_status)
