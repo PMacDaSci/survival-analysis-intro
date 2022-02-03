@@ -3,6 +3,9 @@ navbar:
   left:
   - text: Material
     href: SurvivalAnalysis_I.html
+  right:
+  - icon: fab fa-github
+    href: https://github.com/PMacDaSci/survival-analysis-intro
 output:
   html_document:
     theme: flatly
