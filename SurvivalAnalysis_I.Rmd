@@ -47,8 +47,8 @@ knitr::knit_hooks$set(
 `r text_spec("We'll cover:", background = "#D05A6E", color = "white", bold = T)`
 
 - Some <u>basic </u> R commands
-  - loading pacakges, `R` functions, plotting etc.
-- What is Survival data?
+- loading packages, `R` functions, plotting etc.
+- What is survival data?
 - Why we use survival analysis?
 - Types of survival analysis
 - Censoring in survival data
@@ -135,7 +135,7 @@ The three examples above for the censoring are called **right-censoring** (true 
 
 Other types of censoring: 
 
--**Left-censoring** (true survival time is less than or equal to the observed time): The event-of-interest is occurred before the study end-point, but doesn't know the exact time. For example, a study participant has the event of death before the study finishes (say at 10 months from the surgery), but the event has actually occurred before that. 
+-**Left-censoring** (true survival time is less than or equal to the observed time): The event-of-interest occurred before the study end-point, but don't know the exact time. For example, a study participant has the event of death before the study finishes (say at 10 months from the surgery), but the event has actually occurred before that. 
 
 -**Interval-censoring** (survival time is between two values): When we don't know the exact time of event occurrence, but know that it is within a time interval. 
 
@@ -143,7 +143,7 @@ Other types of censoring:
 
 - Failure to account for the censoring will give you biased parameter estimates about the survival times and the related quantities.
 
-- Standard methods used to analyse survival data with censored observations are valid only if the censoring is **noninformative*’**. In practical terms, this means that censoring carries no prognostic information about subsequent survival experience; in other words, those who are censored because of loss to follow-up at a given point in time should be as likely to have a subsequent event as those individuals who remain in the study. [@Clark2003_I]
+- Standard methods used to analyse survival data with censored observations are valid only if the censoring is **noninformative**. In practical terms, this means that censoring carries no prognostic information about subsequent survival experience; in other words, those who are censored because of loss to follow-up at a given point in time should be as likely to have a subsequent event as those individuals who remain in the study. [@Clark2003_I]
 
 A related example on censoring:
 
@@ -200,13 +200,13 @@ Truncation is defined as a condition which screens certain subjects so that the 
 
 >`r text_spec("Survival probability:", background = "#D05A6E", color = "white", bold = T)` Probability that a patient survives from the diagnosis (time of origin) time to a specific time point *t* (denoted by *S(t)*).
    
->`r text_spec("Hazard probability:", background = "#D05A6E", color = "white", bold = T)` Probability that a patient will have the even of interest at time *t* (denoted by *h(t)*), given that the individual has survived up to time *t*.
+>`r text_spec("Hazard probability:", background = "#D05A6E", color = "white", bold = T)` Probability that a patient will have the event of interest at time *t* (denoted by *h(t)*), given that the individual has survived up to time *t*.
 
 # Kaplan-Meier (KM) survival estimate
 
 KM estimator (a.k.a. product limit estimator) is a non-parametric technique to estimate the survival probability from the observed survival times (Kaplan & Meier, 1958). KM method could be used to obtain survival information of a single study group or between groups. Later means, for example we want to compare the survival pattern of two groups. 
 
-We can use `survival` package in `R` to perform majority of the methods in survival analysis literature. A key function for the analysis of survival data in `R` is function `Surv()`. This is used to specify the type of survival data that we want to analyses, namely, right censored, left censored, interval censored. For our illustrations, we will only consider right censored data in this workshop. 
+We can use `survival` package in `R` to perform the majority of the methods in survival analysis literature. A key function for the analysis of survival data in `R` is the function `Surv()`. This is used to specify the type of survival data that we want to analyse, namely, right censored, left censored, interval censored. For our illustrations, we will only consider right censored data in this workshop. 
 
 The `R` object created by using this function is a  **survival object**. 
 
@@ -221,13 +221,13 @@ We declare a **survival object** in `R` using the minimal command `Surv(time, ev
 
 `survfit` function in the `survival` package can be used to obtain KM estimate and to create survival curves. The first argument of the `survfit` function is a formula ($Y \sim X$), where in the left-hand side we state the type of survival data using the function `Surv()` and in the right-hand side grouping information are provided. 
 
-> What are these `R` codes imply?
+> What do these `R` codes imply?
 
 - `survfit(Surv(time, event) ~ 1)`
 
 - `survfit(Surv(time, event) ~ Treatment)`
 
-Ok... Let's put all these into practice now! We'll consider two examples from ovarian cancer research. One from the study that was discussed in [@Edmonson1979] and the other from Bowtell's lab [@Alsop_2012]. Later study was discussed in the group comparison workshop.
+Ok... Let's put all these into practice now! We'll consider two examples from ovarian cancer research. One from the study that was discussed in [@Edmonson1979] and the other from Bowtell's lab [@Alsop_2012]. The latter study was discussed in the group comparison workshop.
 
 # Case studies
 ## Study 1: Ovarian cancer study [@Edmonson1979]
@@ -267,9 +267,6 @@ install_load(required_R_packages)
 
 ### Loading data from `survival` package
 
-```{r, eval=FALSE, echo=F, message=FALSE, warning=FALSE, comment=""}
-# writexl::write_xlsx(ovarian, "/Users/jayawardanamadawa/Desktop/1.PETERMAC/2.WORK/LABS/1.General/1.Workshops/1.Survival Analysis/Data/ovarian.xlsx")
-```
 
 ```{r, echo=T, message=FALSE, warning=FALSE, comment=""}
 # using the survival R package 
@@ -278,7 +275,7 @@ ovarian_data <- ovarian
 # Structure of your data
 str(ovarian_data)
 
-# Facotorisation of variables
+# Factorisation of variables
 ovarian_data$rx <- factor(ovarian_data$rx, levels = c("1", "2"))
 ovarian_data$resid.ds <- factor(ovarian_data$resid.ds, levels = c("1", "2"), 
                                 labels = c("No", "Yes"))
@@ -509,7 +506,7 @@ Similar conclusion as earlier.
 
 - if survival curves cross, both tests are not optimal
 
-- check if the prportional hazard assumptions is seriously violated (hint: use proportional hazards plot)
+- check if the proportional hazard assumption is seriously violated (hint: use proportional hazards plot)
 
   - Log-rank test is the most powerful test when proportionality assumption is valid
   
@@ -518,7 +515,7 @@ Similar conclusion as earlier.
 
 # Stratified log-rank test
 
-Stratified log-rank test is an extension of the log-rank test to incorporate controlling variable(s) to test the effective difference between survival curves of the the variable of interest. For example, let us assume that we have two treatment groups (A & B) and we want to control for gender (male & female). We may use stratified log-rank test in this case to assess the significance of the survival curves of the two treatment groups controlling for the variable gender. Thus, it provides a method of testing the equivalence of survival curves controlling for the stratified variable [@KleinBook].
+Stratified log-rank test is an extension of the log-rank test to incorporate controlling variable(s) to test the effective difference between survival curves of the variable of interest. For example, let us assume that we have two treatment groups (A & B) and we want to control for gender (male & female). We may use stratified log-rank test in this case to assess the significance of the survival curves of the two treatment groups controlling for the variable gender. Thus, it provides a method of testing the equivalence of survival curves controlling for the stratified variable [@KleinBook].
 
 ## Performing stratified log-rank test
 
